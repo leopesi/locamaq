@@ -35,25 +35,25 @@
         <div class="flex justify-between items-start">
             <div class="flex-1">
                 <div class="flex items-center gap-2 mb-1">
-                    <span class="text-lg">{{ notif.severity_icon }}</span>
+                    <span class="text-2xl">{{ notif.severity_icon }}</span>
                     <h3 class="font-semibold text-gray-800 {% if notif.status == 'unread' %}text-black{% endif %}">{{ notif.title }}</h3>
                     {% if notif.whatsapp_sent %}<span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">📱 WhatsApp</span>{% endif %}
                 </div>
-                <p class="text-sm text-gray-600 whitespace-pre-line">{{ notif.message }}</p>
-                <div class="flex gap-3 mt-2 text-xs text-gray-400">
+                <p class="text-sm text-gray-600 whitespace-pre-line ml-10">{{ notif.message }}</p>
+                <div class="flex gap-3 mt-3 text-xs text-gray-400 ml-10">
                     <span>{{ notif.created_at|date:"d/m/Y H:i" }}</span>
                     <span>{{ notif.get_alert_type_display }}</span>
                     {% if notif.status == 'unread' %}<span class="text-blue-600 font-medium">● Nova</span>{% endif %}
                 </div>
             </div>
-            <div class="flex gap-1 ml-3">
+            <div class="flex gap-3 ml-4 text-2xl">
                 {% if notif.related_rental %}
-                <a href="{% url 'rentals:rental_detail' notif.related_rental.pk %}" class="text-blue-600 hover:text-blue-800 text-sm" title="Ver locação">📋</a>
+                <a href="{% url 'rentals:rental_detail' notif.related_rental.pk %}" class="text-blue-600 hover:text-blue-800" title="Ver locação">📋</a>
                 {% endif %}
                 {% if notif.status == 'unread' %}
-                <a href="{% url 'alerts:mark_read' notif.pk %}" class="text-green-600 hover:text-green-800 text-sm" title="Marcar como lida">✓</a>
+                <a href="{% url 'alerts:mark_read' notif.pk %}" class="text-green-600 hover:text-green-800" title="Marcar como lida">✓</a>
                 {% endif %}
-                <a href="{% url 'alerts:dismiss' notif.pk %}" class="text-gray-400 hover:text-gray-600 text-sm" title="Dispensar">✕</a>
+                <a href="{% url 'alerts:dismiss' notif.pk %}" class="text-gray-400 hover:text-gray-600" title="Dispensar">✕</a>
             </div>
         </div>
     </div>
