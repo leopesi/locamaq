@@ -196,4 +196,37 @@
         </div>
     </form>
 </div>
+
+<script>
+// Auto-preencher endereço de entrega ao selecionar cliente
+document.getElementById('id_customer').addEventListener('change', function() {
+    const customerId = this.value;
+    if (!customerId) return;
+
+    fetch('/customers/' + customerId + '/json/')
+        .then(r => r.json())
+        .then(data => {
+            const fields = {
+                'id_delivery_street': data.delivery_street,
+                'id_delivery_number': data.delivery_number,
+                'id_delivery_neighborhood': data.delivery_neighborhood,
+                'id_delivery_city': data.delivery_city,
+                'id_delivery_state': data.delivery_state,
+                'id_delivery_reference': data.delivery_reference,
+                'id_delivery_contact': data.site_contact_name,
+                'id_delivery_phone': data.site_contact_phone,
+            };
+
+            for (const [id, value] of Object.entries(fields)) {
+                const el = document.getElementById(id);
+                if (el && value && !el.value) {
+                    el.value = value;
+                    el.classList.add('bg-blue-50');
+                    setTimeout(() => el.classList.remove('bg-blue-50'), 2000);
+                }
+            }
+        })
+        .catch(() => {});
+});
+</script>
 {% endblock %}

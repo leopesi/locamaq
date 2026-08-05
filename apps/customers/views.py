@@ -83,3 +83,22 @@ def customer_detail(request, pk):
         'customer': customer,
         'rentals': rentals,
     })
+
+
+@login_required
+def customer_json(request, pk):
+    """Return customer data as JSON (for auto-fill in rental form)."""
+    from django.http import JsonResponse
+    customer = get_object_or_404(Customer, pk=pk, tenant=request.tenant)
+    return JsonResponse({
+        'id': customer.pk,
+        'name': customer.name,
+        'delivery_street': customer.delivery_address or customer.address or '',
+        'delivery_number': customer.delivery_number or customer.number or '',
+        'delivery_neighborhood': customer.delivery_neighborhood or customer.neighborhood or '',
+        'delivery_city': customer.delivery_city or customer.city or 'Araguari',
+        'delivery_state': customer.delivery_state or customer.state or 'MG',
+        'delivery_reference': customer.delivery_reference or '',
+        'site_contact_name': customer.site_contact_name or '',
+        'site_contact_phone': customer.site_contact_phone or customer.phone or '',
+    })
