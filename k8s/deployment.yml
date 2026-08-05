@@ -20,9 +20,11 @@ spec:
       labels:
         app: locamaq
     spec:
+      imagePullSecrets:
+        - name: ghcr-secret
       containers:
         - name: locamaq
-          image: ECR_IMAGE_PLACEHOLDER
+          image: ghcr.io/leopesi/locamaq:latest
           ports:
             - containerPort: 8000
               protocol: TCP
