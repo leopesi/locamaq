@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded', function() {
             '<strong>' + m.title + '</strong><br>' +
             '<small>📍 ' + m.address + '</small><br>' +
             '<small>🔧 ' + m.equipments + '</small><br>' +
-            (m.distance_km ? '<small>📏 ' + m.distance_km + ' km · ⏱️ ~' + m.time_min + ' min</small><br>' : '') +
+            (m.distance_km !== null && m.distance_km !== undefined ? '<small>📏 ' + m.distance_km + ' km · ⏱️ ~' + m.time_min + ' min</small><br>' : '') +
             '<a href="/rentals/' + m.id + '/" style="color:#2563eb;font-size:12px">Ver locação →</a>' +
             '</div>'
         );
