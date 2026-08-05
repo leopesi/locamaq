@@ -3,44 +3,60 @@
 <head>
     <meta charset="utf-8">
     <style>
-        body { font-family: Arial, sans-serif; font-size: 12px; margin: 20mm; color: #333; }
-        h1 { font-size: 18px; text-align: center; border-bottom: 2px solid #1e40af; padding-bottom: 10px; }
-        h2 { font-size: 14px; color: #1e40af; margin-top: 20px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #eee; }
+        @page { size: A4; margin: 12mm; }
+        body { font-family: Arial, sans-serif; font-size: 11px; margin: 0; padding: 0; color: #333; line-height: 1.4; }
+        h1 { font-size: 16px; text-align: center; border-bottom: 2px solid #1e40af; padding-bottom: 6px; margin: 0 0 8px 0; }
+        h2 { font-size: 12px; color: #1e40af; margin: 10px 0 4px 0; border-bottom: 1px solid #ddd; padding-bottom: 3px; }
+        table { width: 100%; border-collapse: collapse; margin: 4px 0; }
+        th, td { padding: 4px 6px; text-align: left; border-bottom: 1px solid #eee; font-size: 10px; }
         th { background: #f8fafc; font-weight: bold; }
-        .total { font-size: 16px; font-weight: bold; text-align: right; margin-top: 10px; }
-        .header-info { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .company-info { margin-bottom: 15px; }
-        .customer-info { background: #f8fafc; padding: 15px; border-radius: 5px; margin: 10px 0; }
-        .clauses { font-size: 10px; color: #666; margin-top: 30px; line-height: 1.6; }
-        .clauses h3 { font-size: 11px; color: #333; margin-top: 15px; }
-        .signature-area { margin-top: 50px; display: flex; justify-content: space-between; }
-        .signature-line { width: 45%; text-align: center; border-top: 1px solid #333; padding-top: 5px; margin-top: 60px; font-size: 10px; }
-        .footer { margin-top: 30px; text-align: center; font-size: 10px; color: #999; }
+        .total { font-size: 13px; font-weight: bold; text-align: right; margin: 6px 0; }
+        .company-info { font-size: 10px; margin-bottom: 8px; }
+        .customer-info { background: #f8fafc; padding: 8px; border-radius: 4px; margin: 4px 0; font-size: 10px; }
+        .clauses { font-size: 8px; color: #555; margin-top: 10px; line-height: 1.3; columns: 2; column-gap: 15px; }
+        .clauses h3 { font-size: 9px; color: #333; margin: 6px 0 2px 0; font-weight: bold; break-after: avoid; }
+        .clauses p { margin: 0 0 3px 0; break-inside: avoid; }
+        .signature-area { margin-top: 15px; display: flex; justify-content: space-between; }
+        .signature-line { width: 44%; text-align: center; border-top: 1px solid #333; padding-top: 4px; font-size: 9px; margin-top: 35px; }
+        .footer { margin-top: 8px; text-align: center; font-size: 8px; color: #999; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .meta { font-size: 10px; margin: 4px 0; }
+        .meta strong { color: #1e40af; }
     </style>
 </head>
 <body>
     <h1>COMPROVANTE DE LOCAÇÃO</h1>
 
-    <div class="company-info">
-        <strong>{{ tenant.name }}</strong><br>
-        CNPJ: {{ tenant.document }}<br>
-        {% if tenant.phone %}Tel: {{ tenant.phone }}<br>{% endif %}
-        {% if tenant.address %}{{ tenant.address }}{% endif %}
+    <!-- Empresa + Número -->
+    <div class="grid-2">
+        <div class="company-info">
+            <strong>{{ tenant.name }}</strong><br>
+            CNPJ: {{ tenant.document }}<br>
+            {% if tenant.phone %}Tel: {{ tenant.phone }}{% endif %}
+            {% if tenant.email %} | {{ tenant.email }}{% endif %}<br>
+            {% if tenant.address %}{{ tenant.address }}{% endif %}
+        </div>
+        <div style="text-align: right; font-size: 10px;">
+            <strong>Nº {{ rental.pk }}</strong><br>
+            Data: {{ rental.created_at|date:"d/m/Y H:i" }}<br>
+            Período: {{ rental.get_period_type_display }}<br>
+            Pagamento: {{ rental.get_payment_method_display }}
+        </div>
     </div>
 
-    <p><strong>Locação Nº:</strong> {{ rental.pk }} | <strong>Data:</strong> {{ rental.created_at|date:"d/m/Y H:i" }}</p>
-
-    <h2>Dados do Cliente</h2>
+    <!-- Cliente -->
+    <h2>Cliente</h2>
     <div class="customer-info">
-        <strong>{{ rental.customer.name }}</strong><br>
-        {% if rental.customer.document %}CPF/CNPJ: {{ rental.customer.document }}<br>{% endif %}
-        {% if rental.customer.phone %}Telefone: {{ rental.customer.phone }}<br>{% endif %}
-        {% if rental.customer.address %}Endereço: {{ rental.customer.address }}{% endif %}
+        <strong>{{ rental.customer.name }}</strong>
+        {% if rental.customer.document %} — {{ rental.customer.document }}{% endif %}<br>
+        {% if rental.customer.phone %}Tel: {{ rental.customer.phone }}{% endif %}
+        {% if rental.customer.whatsapp %} | WhatsApp: {{ rental.customer.whatsapp }}{% endif %}<br>
+        {% if rental.delivery_address %}Entrega: {{ rental.delivery_address }}{% endif %}
+        {% if rental.delivery_contact %}<br>Responsável: {{ rental.delivery_contact }} — {{ rental.delivery_phone }}{% endif %}
     </div>
 
-    <h2>Equipamentos Locados</h2>
+    <!-- Equipamentos -->
+    <h2>Equipamentos</h2>
     <table>
         <thead>
             <tr>
@@ -66,13 +82,14 @@
 
     <p class="total">VALOR TOTAL: R$ {{ rental.total_value }}</p>
 
-    <h2>Condições da Locação</h2>
-    <p><strong>Período:</strong> {{ rental.get_period_type_display }}</p>
-    <p><strong>Início:</strong> {{ rental.start_date|date:"d/m/Y" }}</p>
-    <p><strong>Devolução Prevista:</strong> {{ rental.expected_return|date:"d/m/Y" }}</p>
-    <p><strong>Forma de Pagamento:</strong> {{ rental.get_payment_method_display }}</p>
-    <p><strong>Situação:</strong> {% if rental.is_paid %}Pago{% if rental.paid_at %} em {{ rental.paid_at|date:"d/m/Y" }}{% endif %}{% else %}Pendente{% endif %}</p>
+    <!-- Período -->
+    <div class="meta">
+        <strong>Início:</strong> {{ rental.start_date|date:"d/m/Y" }} &nbsp;|&nbsp;
+        <strong>Devolução:</strong> {{ rental.expected_return|date:"d/m/Y" }} &nbsp;|&nbsp;
+        <strong>Situação:</strong> {% if rental.is_paid %}Pago{% if rental.paid_at %} em {{ rental.paid_at|date:"d/m/Y" }}{% endif %}{% else %}Pendente{% endif %}
+    </div>
 
+    <!-- Cláusulas (2 colunas, compacto) -->
     <div class="clauses">
         {% if tenant.contract_clauses %}
         <h3>Cláusulas Gerais</h3>
@@ -90,14 +107,12 @@
         {% endif %}
 
         {% if not tenant.contract_clauses and not tenant.return_conditions %}
-        <h3>Termos e Condições</h3>
-        <p>1. O locatário se responsabiliza pela conservação e bom uso dos equipamentos locados.</p>
-        <p>2. Em caso de dano ou extravio, o locatário deverá indenizar o locador pelo valor de reposição.</p>
-        <p>3. A devolução deverá ser feita na data prevista, sob pena de cobrança de diárias adicionais.</p>
-        <p>4. O atraso na devolução acarretará multa de 2% ao dia sobre o valor total da locação.</p>
+        <h3>Termos</h3>
+        <p>1. O locatário se responsabiliza pela conservação dos equipamentos. 2. Danos ou extravio serão indenizados pelo valor de reposição. 3. Atraso na devolução: multa de 10% + diária excedente. 4. Foro: Comarca de Araguari/MG.</p>
         {% endif %}
     </div>
 
+    <!-- Assinaturas -->
     <div class="signature-area">
         <div class="signature-line">
             {{ tenant.name }}<br>Locador
@@ -108,7 +123,7 @@
     </div>
 
     <div class="footer">
-        Documento gerado em {{ rental.created_at|date:"d/m/Y H:i" }} | LocaMaq — Sistema de Gestão de Locação
+        Documento gerado em {{ rental.created_at|date:"d/m/Y H:i" }} | {{ tenant.name }} — Sistema LocaMaq
     </div>
 </body>
 </html>
