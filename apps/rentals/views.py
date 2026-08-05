@@ -115,7 +115,42 @@ def rental_create(request):
             rental.calculate_total()
             rental.save()
 
-            messages.success(request, f'Locação #{rental.pk} criada com sucesso! Valor: R$ {rental.total_value}')
+            # Criar transação no fluxo de caixa
+            from django.utils import timezone
+            today = timezone.now().date()
+
+            if rental.payment_method == 'cash' or rental.payment_method == 'pix' or rental.payment_method == 'debit_card':
+                # Pagamento à vista — já pago
+                payment_status = 'paid'
+                paid_date = today
+                rental.is_paid = True
+                rental.paid_at = today
+                rental.save()
+            elif rental.payment_method == 'credit_card':
+                # Cartão de crédito — pendente (recebe em 30 dias)
+                payment_status = 'pending'
+                paid_date = None
+            else:
+                # A Receber / Transferência — pendente
+                payment_status = 'pending'
+                paid_date = None
+
+            Transaction.objects.create(
+                tenant=request.tenant,
+                type=Transaction.Type.INCOME,
+                value=rental.total_value,
+                description=f'Locação #{rental.pk} - {rental.customer.name} ({rental.get_payment_method_display()})',
+                date=today,
+                due_date=rental.expected_return,
+                paid_date=paid_date,
+                payment_status=payment_status,
+                payment_method=rental.get_payment_method_display(),
+                rental=rental,
+                created_by=request.user,
+            )
+
+            status_msg = 'Pago' if payment_status == 'paid' else 'A Receber'
+            messages.success(request, f'Locação #{rental.pk} criada! Valor: R$ {rental.total_value} — {status_msg}')
             return redirect('rentals:rental_detail', pk=rental.pk)
     else:
         form = RentalForm(request.tenant)
@@ -236,15 +271,25 @@ def rental_return(request, pk):
                 )
 
             # Create financial transaction
-            Transaction.objects.create(
-                tenant=request.tenant,
-                type=Transaction.Type.INCOME,
-                value=rental.total_value,
-                description=f'Recebimento Locação #{rental.pk} - {rental.customer.name}',
-                date=form.cleaned_data['actual_return'],
-                rental=rental,
-                created_by=request.user,
-            )
+            # Se já existia transação pendente, marca como paga
+            existing_tx = Transaction.objects.filter(rental=rental, payment_status='pending').first()
+            if existing_tx:
+                existing_tx.payment_status = 'paid'
+                existing_tx.paid_date = form.cleaned_data['actual_return']
+                existing_tx.save()
+            else:
+                Transaction.objects.create(
+                    tenant=request.tenant,
+                    type=Transaction.Type.INCOME,
+                    value=rental.total_value,
+                    description=f'Recebimento Locação #{rental.pk} - {rental.customer.name}',
+                    date=form.cleaned_data['actual_return'],
+                    paid_date=form.cleaned_data['actual_return'],
+                    payment_status='paid',
+                    payment_method=rental.get_payment_method_display(),
+                    rental=rental,
+                    created_by=request.user,
+                )
 
             messages.success(request, f'Locação #{rental.pk} devolvida. Entrada de R$ {rental.total_value} registrada.')
             return redirect('rentals:rental_detail', pk=rental.pk)
