@@ -16,6 +16,7 @@ def generate_pdf(request, rental_id):
         'rental': rental,
         'items': items,
         'tenant': request.tenant,
+        'user': request.user,
     })
 
     # Try WeasyPrint first
