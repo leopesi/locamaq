@@ -271,13 +271,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const icon = getIcon(m);
         const marker = L.marker([m.lat, m.lng], {icon: icon}).addTo(map);
         marker.bindPopup(
-            '<div style="min-width:220px">' +
-            (m.alert_text ? '<div style="background:#fee2e2;color:#991b1b;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:bold;margin-bottom:6px">⚠️ ' + m.alert_text + '</div>' : '') +
-            '<strong>' + m.title + '</strong><br>' +
-            '<small>📍 ' + m.address + '</small><br>' +
-            '<small>🔧 ' + m.equipments + '</small><br>' +
-            (m.distance_km !== null && m.distance_km !== undefined ? '<small>📏 ' + m.distance_km + ' km · ⏱️ ~' + m.time_min + ' min</small><br>' : '') +
-            '<a href="/rentals/' + m.id + '/" style="color:#2563eb;font-size:12px">Ver locação →</a>' +
+            '<div style="min-width:240px;font-size:14px;line-height:1.6">' +
+            (m.alert_text ? '<div style="background:#fee2e2;color:#991b1b;padding:5px 10px;border-radius:4px;font-size:12px;font-weight:bold;margin-bottom:8px">⚠️ ' + m.alert_text + '</div>' : '') +
+            '<strong style="font-size:15px">' + m.title + '</strong><br>' +
+            '<span>📍 ' + m.address + '</span><br>' +
+            '<span>🔧 ' + m.equipments + '</span><br>' +
+            (m.distance_km !== null && m.distance_km !== undefined ? '<span style="color:#2563eb;font-weight:500">📏 ' + m.distance_km + ' km · ⏱️ ~' + m.time_min + ' min</span><br>' : '') +
+            '<a href="/rentals/' + m.id + '/" style="color:#2563eb;font-size:13px;font-weight:500;text-decoration:underline">Ver locação →</a>' +
             '</div>'
         );
         bounds.push([m.lat, m.lng]);
