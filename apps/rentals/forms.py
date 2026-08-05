@@ -54,8 +54,13 @@ class RentalForm(forms.ModelForm):
     qty_10 = forms.IntegerField(min_value=1, initial=1, required=False, label='Qtd')
     value_10 = forms.DecimalField(max_digits=10, decimal_places=2, required=False, label='Valor Unit.')
 
-    # Endereço de entrega (obrigatórios)
-    delivery_address = forms.CharField(max_length=300, required=True, label='Endereço de Entrega *')
+    # Endereço de entrega (estruturado)
+    delivery_street = forms.CharField(max_length=200, required=True, label='Rua/Avenida *')
+    delivery_number = forms.CharField(max_length=20, required=True, label='Número *')
+    delivery_complement = forms.CharField(max_length=100, required=False, label='Complemento')
+    delivery_neighborhood = forms.CharField(max_length=100, required=True, label='Bairro *')
+    delivery_city = forms.CharField(max_length=100, required=True, initial='Araguari', label='Cidade *')
+    delivery_state = forms.CharField(max_length=2, required=True, initial='MG', label='UF *')
     delivery_reference = forms.CharField(max_length=200, required=False, label='Ponto de Referência')
     delivery_contact = forms.CharField(max_length=200, required=True, label='Responsável no Local *')
     delivery_phone = forms.CharField(max_length=20, required=True, label='Telefone do Responsável *')
@@ -100,7 +105,12 @@ class RentalForm(forms.ModelForm):
             self.fields[f'value_{i}'].widget.attrs['placeholder'] = '0 = tabela'
             self.fields[f'qty_{i}'].widget.attrs['placeholder'] = '1'
 
-        self.fields['delivery_address'].widget.attrs['placeholder'] = 'Rua, número - Bairro, Cidade/UF'
+        self.fields['delivery_street'].widget.attrs['placeholder'] = 'Ex: Av. Minas Gerais'
+        self.fields['delivery_number'].widget.attrs['placeholder'] = 'Ex: 500'
+        self.fields['delivery_complement'].widget.attrs['placeholder'] = 'Sala, Bloco, Lote...'
+        self.fields['delivery_neighborhood'].widget.attrs['placeholder'] = 'Ex: Centro'
+        self.fields['delivery_city'].widget.attrs['placeholder'] = 'Araguari'
+        self.fields['delivery_state'].widget.attrs['placeholder'] = 'MG'
         self.fields['delivery_reference'].widget.attrs['placeholder'] = 'Próximo a...'
         self.fields['delivery_contact'].widget.attrs['placeholder'] = 'Nome do responsável na obra'
         self.fields['delivery_phone'].widget.attrs['placeholder'] = '(34) 9 9999-9999'

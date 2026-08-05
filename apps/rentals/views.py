@@ -6,6 +6,7 @@ from django.utils import timezone
 from .models import Rental, RentalItem
 from .forms import RentalForm, RentalItemForm, RentalReturnForm, RentalEditForm
 from .services.geocoding import geocode_address
+from .services.routing import estimate_delivery_time
 from apps.inventory.models import Equipment, EquipmentHistory
 from apps.finance.models import Transaction
 from apps.core.cache import invalidate_on_write
@@ -45,7 +46,21 @@ def rental_create(request):
             rental = form.save(commit=False)
             rental.tenant = request.tenant
             rental.created_by = request.user
-            rental.delivery_address = form.cleaned_data.get('delivery_address', '')
+
+            # Montar endereço completo a partir dos campos estruturados
+            street = form.cleaned_data.get('delivery_street', '')
+            number = form.cleaned_data.get('delivery_number', '')
+            complement = form.cleaned_data.get('delivery_complement', '')
+            neighborhood = form.cleaned_data.get('delivery_neighborhood', '')
+            city = form.cleaned_data.get('delivery_city', 'Araguari')
+            state = form.cleaned_data.get('delivery_state', 'MG')
+
+            parts = [f'{street}, {number}']
+            if complement:
+                parts.append(complement)
+            parts.append(f'{neighborhood} - {city}/{state}')
+            rental.delivery_address = ', '.join(parts)
+
             rental.delivery_reference = form.cleaned_data.get('delivery_reference', '')
             rental.delivery_contact = form.cleaned_data.get('delivery_contact', '')
             rental.delivery_phone = form.cleaned_data.get('delivery_phone', '')
@@ -55,6 +70,13 @@ def rental_create(request):
                 lat, lng = geocode_address(rental.delivery_address)
                 rental.delivery_lat = lat
                 rental.delivery_lng = lng
+
+                # Calcular tempo de entrega
+                if lat and lng:
+                    estimate = estimate_delivery_time(lat, lng)
+                    if estimate:
+                        rental.delivery_distance_km = estimate['distance_km']
+                        rental.delivery_time_min = estimate['duration_min']
 
             rental.save()
 

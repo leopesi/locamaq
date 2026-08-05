@@ -69,6 +69,8 @@ class Rental(models.Model):
     delivery_phone = models.CharField('Telefone do Responsável', max_length=20, blank=True)
     delivery_lat = models.DecimalField('Latitude', max_digits=10, decimal_places=7, null=True, blank=True)
     delivery_lng = models.DecimalField('Longitude', max_digits=10, decimal_places=7, null=True, blank=True)
+    delivery_distance_km = models.DecimalField('Distância (km)', max_digits=6, decimal_places=1, null=True, blank=True)
+    delivery_time_min = models.IntegerField('Tempo estimado (min)', null=True, blank=True)
 
     notes = models.TextField('Observações', blank=True)
     created_by = models.ForeignKey(
