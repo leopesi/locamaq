@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
 
 from .models import User
-from .forms import LoginForm, UserCreateForm, UserUpdateForm
+from .forms import LoginForm, UserCreateForm, UserUpdateForm, ProfileForm
 from .decorators import admin_required, tenant_required
 
 
@@ -64,5 +65,33 @@ def user_delete(request, pk):
 
 @login_required
 def profile(request):
-    """User profile view."""
-    return render(request, 'accounts/profile.html')
+    """User profile view and edit."""
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Perfil atualizado com sucesso.')
+            return redirect('accounts:profile')
+    else:
+        form = ProfileForm(instance=request.user)
+    return render(request, 'accounts/profile.html', {'form': form})
+
+
+@login_required
+def change_password(request):
+    """Change password view."""
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Senha alterada com sucesso.')
+            return redirect('accounts:profile')
+    else:
+        form = PasswordChangeForm(request.user)
+    for field in form.fields.values():
+        field.widget.attrs['class'] = (
+            'w-full px-4 py-2 border border-gray-300 rounded-lg '
+            'focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+        )
+    return render(request, 'accounts/change_password.html', {'form': form})

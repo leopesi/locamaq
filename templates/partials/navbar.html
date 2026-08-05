@@ -8,7 +8,10 @@
         <button onclick="toggleSidebar()" class="lg:hidden text-gray-400 text-xl">✕</button>
     </div>
 
-    <nav class="mt-4">
+    <nav class="mt-2">
+        <!-- GESTÃO -->
+        <div class="px-6 py-2 text-xs text-gray-500 uppercase tracking-wider">Gestão</div>
+
         <a href="{% url 'tenants:dashboard' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
             <span class="mr-3">📊</span> Dashboard
         </a>
@@ -27,12 +30,19 @@
         <a href="{% url 'alerts:notification_list' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
             <span class="mr-3">🔔</span> Notificações
         </a>
+
         {% if user.is_admin %}
+        <!-- ADMINISTRAÇÃO -->
+        <div class="px-6 py-2 mt-4 text-xs text-gray-500 uppercase tracking-wider border-t border-gray-700 pt-4">Administração</div>
+
         <a href="{% url 'promotions:promotion_list' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
             <span class="mr-3">📢</span> Promoções
         </a>
         <a href="{% url 'accounts:user_list' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
             <span class="mr-3">👥</span> Usuários
+        </a>
+        <a href="{% url 'alerts:setup' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
+            <span class="mr-3">🔔</span> Config. Alertas
         </a>
         <a href="{% url 'tenants:settings_general' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
             <span class="mr-3">⚙️</span> Configurações
@@ -42,18 +52,19 @@
         </a>
         {% endif %}
 
-        <div class="border-t border-gray-700 mt-6 pt-4">
-            <a href="{% url 'accounts:profile' %}" class="flex items-center px-6 py-2 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
-                <div class="text-sm text-gray-300">
-                    {{ user.get_full_name|default:user.username }}
-                    <br><span class="text-xs text-gray-500">{{ user.get_role_display }}</span>
-                    {% if user.tenant %}<br><span class="text-xs text-blue-400">{{ user.tenant.name }}</span>{% endif %}
-                </div>
-            </a>
-            <a href="{% url 'accounts:logout' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition text-red-400" onclick="closeSidebarMobile()">
-                <span class="mr-3">🚪</span> Sair
-            </a>
-        </div>
+        <!-- CONTA -->
+        <div class="px-6 py-2 mt-4 text-xs text-gray-500 uppercase tracking-wider border-t border-gray-700 pt-4">Conta</div>
+
+        <a href="{% url 'accounts:profile' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
+            <div class="text-sm text-gray-300">
+                <span class="mr-3">👤</span> {{ user.get_full_name|default:user.username }}
+                <br><span class="text-xs text-gray-500 ml-8">{{ user.get_role_display }}</span>
+                {% if user.tenant %}<br><span class="text-xs text-blue-400 ml-8">{{ user.tenant.name }}</span>{% endif %}
+            </div>
+        </a>
+        <a href="{% url 'accounts:logout' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition text-red-400" onclick="closeSidebarMobile()">
+            <span class="mr-3">🚪</span> Sair
+        </a>
     </nav>
 </aside>
 
