@@ -3,21 +3,33 @@
 {% block title %}Promoções — LocaMaq{% endblock %}
 
 {% block content %}
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">Promoções</h1>
+<div class="flex flex-wrap justify-between items-center mb-6 gap-3">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📢 Promoções</h1>
     <a href="{% url 'promotions:promotion_create' %}"
        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
         + Nova Promoção
     </a>
 </div>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
-    <table class="w-full">
+<!-- Instruções -->
+<div class="bg-blue-50 border border-blue-200 rounded-lg p-5 mb-6">
+    <h3 class="font-bold text-blue-800 mb-2">💡 Como funciona</h3>
+    <ol class="list-decimal list-inside space-y-1 text-sm text-blue-700">
+        <li><strong>Crie</strong> a promoção com título, mensagem e imagem (opcional)</li>
+        <li><strong>Selecione</strong> os clientes que receberão (todos ou filtrados)</li>
+        <li><strong>Envie</strong> via WhatsApp — a mensagem é disparada para cada cliente selecionado</li>
+        <li>Acompanhe o <strong>status</strong>: Pendente (não enviada) ou Enviada (com data e quantidade)</li>
+    </ol>
+    <p class="text-xs text-blue-600 mt-3">⚠️ É necessário configurar a Evolution API em ⚙️ Configurações → WhatsApp para o envio funcionar.</p>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-x-auto">
+    <table class="w-full min-w-[600px]">
         <thead class="bg-gray-50">
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Título</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Criada em</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Enviada</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Destinatários</th>
                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
             </tr>
@@ -26,24 +38,31 @@
             {% for promo in promotions %}
             <tr class="hover:bg-gray-50">
                 <td class="px-6 py-4 font-medium">{{ promo.title }}</td>
-                <td class="px-6 py-4 text-gray-600">{{ promo.created_at|date:"d/m/Y H:i" }}</td>
+                <td class="px-6 py-4 text-gray-600 text-sm">{{ promo.created_at|date:"d/m/Y H:i" }}</td>
                 <td class="px-6 py-4">
                     {% if promo.sent_at %}
-                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">{{ promo.sent_at|date:"d/m/Y H:i" }}</span>
+                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">✅ Enviada {{ promo.sent_at|date:"d/m/Y H:i" }}</span>
                     {% else %}
-                    <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Pendente</span>
+                    <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">⏳ Pendente</span>
                     {% endif %}
                 </td>
                 <td class="px-6 py-4 text-gray-600">{{ promo.recipients_count }}</td>
                 <td class="px-6 py-4 text-right">
                     {% if not promo.sent_at %}
-                    <a href="{% url 'promotions:promotion_send' promo.pk %}" class="text-green-600 hover:text-green-900">Enviar</a>
+                    <a href="{% url 'promotions:promotion_send' promo.pk %}" class="text-green-600 hover:text-green-800 text-sm mr-2">📱 Enviar</a>
+                    {% else %}
+                    <a href="{% url 'promotions:promotion_send' promo.pk %}" class="text-blue-600 hover:text-blue-800 text-sm mr-2">🔄 Reenviar</a>
                     {% endif %}
+                    <a href="{% url 'promotions:promotion_edit' promo.pk %}" class="text-yellow-600 hover:text-yellow-800 text-sm">✏️ Editar</a>
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" class="px-6 py-4 text-center text-gray-500">Nenhuma promoção criada.</td>
+                <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                    <div class="text-4xl mb-3">📢</div>
+                    <p>Nenhuma promoção criada.</p>
+                    <p class="text-xs mt-2">Crie sua primeira promoção para divulgar ofertas aos clientes via WhatsApp.</p>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

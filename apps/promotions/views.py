@@ -38,6 +38,22 @@ def promotion_create(request):
 
 @login_required
 @admin_required
+def promotion_edit(request, pk):
+    """Edit a promotion."""
+    promotion = get_object_or_404(Promotion, pk=pk, tenant=request.tenant)
+    if request.method == 'POST':
+        form = PromotionForm(request.POST, request.FILES, instance=promotion)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Promoção "{promotion.title}" atualizada.')
+            return redirect('promotions:promotion_list')
+    else:
+        form = PromotionForm(instance=promotion)
+    return render(request, 'promotions/promotion_form.html', {'form': form, 'title': f'Editar: {promotion.title}'})
+
+
+@login_required
+@admin_required
 def promotion_send(request, pk):
     """Send promotion to selected customers."""
     promotion = get_object_or_404(Promotion, pk=pk, tenant=request.tenant)
