@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   web:
-    build: .
+    image: ghcr.io/leopesi/locamaq:latest
     container_name: locamaq-web
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings.prod
@@ -12,9 +12,16 @@ services:
       - sqlite_data:/app/data
       - media_data:/app/media
       - static_data:/app/staticfiles
+      - logs_data:/app/logs
     restart: unless-stopped
     depends_on:
       - nginx
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/accounts/login/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   nginx:
     image: nginx:alpine
@@ -32,3 +39,4 @@ volumes:
   sqlite_data:
   media_data:
   static_data:
+  logs_data:

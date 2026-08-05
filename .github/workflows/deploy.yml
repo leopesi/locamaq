@@ -1,4 +1,4 @@
-name: CI/CD — Build & Deploy
+name: CI/CD — Build & Deploy (Hostinger)
 
 on:
   push:
@@ -9,10 +9,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  AWS_REGION: us-east-1
-  EKS_CLUSTER: bittar-hml
-  NAMESPACE: locamaq
-  DJANGO_SETTINGS_MODULE: config.settings.prod
 
 jobs:
   # ─────────────────────────────────────────────
@@ -57,7 +53,7 @@ jobs:
           DJANGO_SETTINGS_MODULE: config.settings.dev
 
   # ─────────────────────────────────────────────
-  # JOB 2: Build Docker + Push GitHub Container Registry
+  # JOB 2: Build Docker + Push GHCR
   # ─────────────────────────────────────────────
   build:
     name: 🐳 Build & Push (GHCR)
@@ -67,10 +63,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-
-    outputs:
-      image_tag: ${{ steps.meta.outputs.tags }}
-      image_digest: ${{ steps.build-push.outputs.digest }}
 
     steps:
       - uses: actions/checkout@v4
@@ -92,7 +84,6 @@ jobs:
             type=raw,value=latest
 
       - name: Build e Push
-        id: build-push
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -103,69 +94,41 @@ jobs:
           cache-to: type=inline
 
   # ─────────────────────────────────────────────
-  # JOB 3: Deploy no EKS
+  # JOB 3: Deploy via SSH na Hostinger
   # ─────────────────────────────────────────────
   deploy:
-    name: 🚀 Deploy EKS
+    name: 🚀 Deploy Hostinger (SSH)
     runs-on: ubuntu-latest
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment: production
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Configurar AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /opt/locamaq
 
-      - name: Configurar kubectl
-        run: |
-          aws eks update-kubeconfig \
-            --name $EKS_CLUSTER \
-            --region $AWS_REGION
+            echo "📥 Pulling latest image..."
+            docker pull ghcr.io/leopesi/locamaq:latest
 
-      - name: Criar namespace (se não existir)
-        run: |
-          kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+            echo "🔄 Restarting containers..."
+            docker-compose -f docker-compose.prod.yml down
+            docker-compose -f docker-compose.prod.yml up -d
 
-      - name: Criar imagePullSecret para GHCR
-        run: |
-          kubectl create secret docker-registry ghcr-secret \
-            --docker-server=ghcr.io \
-            --docker-username=${{ github.actor }} \
-            --docker-password=${{ secrets.GHCR_TOKEN }} \
-            --namespace=$NAMESPACE \
-            --dry-run=client -o yaml | kubectl apply -f -
+            echo "🗃️ Running migrations..."
+            docker exec locamaq-web python manage.py migrate --noinput
 
-      - name: Aplicar manifests K8s
-        run: |
-          kubectl apply -f k8s/ -n $NAMESPACE
+            echo "📦 Collecting static files..."
+            docker exec locamaq-web python manage.py collectstatic --noinput
 
-      - name: Atualizar imagem do deployment
-        run: |
-          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${GITHUB_SHA::8}"
-          kubectl set image deployment/locamaq \
-            locamaq=$IMAGE \
-            -n $NAMESPACE
-          echo "🚀 Deploying: $IMAGE"
+            echo "🧹 Cleaning old images..."
+            docker image prune -f
 
-      - name: Aguardar rollout
-        run: |
-          kubectl rollout status deployment/locamaq \
-            -n $NAMESPACE \
-            --timeout=300s
-
-      - name: Verificar pods
-        run: |
-          kubectl get pods -n $NAMESPACE
-          echo ""
-          echo "✅ Deploy concluído!"
-
-      - name: Executar migrations (post-deploy)
-        run: |
-          POD=$(kubectl get pods -n $NAMESPACE -l app=locamaq -o jsonpath='{.items[0].metadata.name}')
-          kubectl exec $POD -n $NAMESPACE -- python manage.py migrate --noinput
+            echo "✅ Deploy concluído!"
+            docker ps | grep locamaq
