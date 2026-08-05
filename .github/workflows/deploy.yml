@@ -1,0 +1,176 @@
+name: CI/CD — Build & Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: locamaq
+  EKS_CLUSTER: bittar-prod
+  NAMESPACE: locamaq
+  DJANGO_SETTINGS_MODULE: config.settings.prod
+
+jobs:
+  # ─────────────────────────────────────────────
+  # JOB 1: Testes e Validação
+  # ─────────────────────────────────────────────
+  test:
+    name: 🧪 Testes
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Configurar .env
+        run: |
+          cp .env.example .env
+          echo "SECRET_KEY=ci-test-secret-key-not-for-production-use" >> .env
+
+      - name: Verificar configuração Django
+        run: python manage.py check
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.dev
+
+      - name: Executar migrations
+        run: python manage.py migrate
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.dev
+
+      - name: Rodar testes
+        run: python manage.py test --verbosity=2
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.dev
+
+  # ─────────────────────────────────────────────
+  # JOB 2: Build Docker + Push ECR
+  # ─────────────────────────────────────────────
+  build:
+    name: 🐳 Build & Push
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    outputs:
+      image_tag: ${{ steps.meta.outputs.image_tag }}
+      image_uri: ${{ steps.meta.outputs.image_uri }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login no Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Metadata da imagem
+        id: meta
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          IMAGE_TAG="${GITHUB_SHA::8}"
+          IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "image_uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
+          echo "📦 Image: ${IMAGE_URI}"
+
+      - name: Build Docker image
+        env:
+          IMAGE_URI: ${{ steps.meta.outputs.image_uri }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --cache-from $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            -t $IMAGE_URI \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            .
+
+      - name: Push para ECR
+        env:
+          IMAGE_URI: ${{ steps.meta.outputs.image_uri }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker push $IMAGE_URI
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "✅ Pushed: $IMAGE_URI"
+
+  # ─────────────────────────────────────────────
+  # JOB 3: Deploy no EKS
+  # ─────────────────────────────────────────────
+  deploy:
+    name: 🚀 Deploy EKS
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Configurar kubectl
+        run: |
+          aws eks update-kubeconfig \
+            --name $EKS_CLUSTER \
+            --region $AWS_REGION
+
+      - name: Criar namespace (se não existir)
+        run: |
+          kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Aplicar manifests K8s
+        run: |
+          kubectl apply -f k8s/ -n $NAMESPACE
+
+      - name: Atualizar imagem do deployment
+        env:
+          IMAGE_URI: ${{ needs.build.outputs.image_uri }}
+        run: |
+          kubectl set image deployment/locamaq \
+            locamaq=$IMAGE_URI \
+            -n $NAMESPACE
+          
+          echo "🚀 Deploying: $IMAGE_URI"
+
+      - name: Aguardar rollout
+        run: |
+          kubectl rollout status deployment/locamaq \
+            -n $NAMESPACE \
+            --timeout=300s
+
+      - name: Verificar pods
+        run: |
+          kubectl get pods -n $NAMESPACE
+          echo ""
+          echo "✅ Deploy concluído com sucesso!"
+
+      - name: Executar migrations (post-deploy)
+        run: |
+          POD=$(kubectl get pods -n $NAMESPACE -l app=locamaq -o jsonpath='{.items[0].metadata.name}')
+          kubectl exec $POD -n $NAMESPACE -- python manage.py migrate --noinput
