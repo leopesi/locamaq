@@ -97,6 +97,8 @@ def dashboard(request):
             'has_alert': has_alert,
             'is_overdue': is_overdue,
             'alert_text': 'ATRASADA' if is_overdue else ('PAGAMENTO PENDENTE' if has_alert else ''),
+            'distance_km': float(rental.delivery_distance_km) if rental.delivery_distance_km else None,
+            'time_min': rental.delivery_time_min,
         })
 
     import json

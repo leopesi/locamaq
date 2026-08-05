@@ -41,6 +41,9 @@ def customer_create(request):
             customer.tenant = request.tenant
             customer.save()
             messages.success(request, f'Cliente "{customer.name}" cadastrado.')
+            next_url = request.GET.get('next', '')
+            if next_url:
+                return redirect(next_url)
             return redirect('customers:customer_list')
     else:
         form = CustomerForm()
