@@ -24,6 +24,12 @@ def home(request):
 
 
 @login_required
+def guide(request):
+    """Step-by-step onboarding guide."""
+    return render(request, 'onboarding/guide.html')
+
+
+@login_required
 def dashboard(request):
     """Main dashboard view with real metrics. Cached per tenant (60s)."""
     tenant = request.tenant

@@ -1,0 +1,352 @@
+{% extends "base.html" %}
+
+{% block title %}Guia Passo a Passo — LocaMaq{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">📚 Guia Passo a Passo</h1>
+    <p class="text-gray-500 mb-8">Siga os passos abaixo para configurar e usar o sistema corretamente.</p>
+
+    <!-- Progress -->
+    <div class="bg-white rounded-lg shadow p-4 mb-8">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium text-gray-700">Progresso do Setup</span>
+            <span class="text-sm text-gray-500" id="progress-text">0 de 6 concluídos</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-3">
+            <div id="progress-bar" class="bg-blue-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <!-- Steps -->
+    <div class="space-y-4">
+
+        <!-- PASSO 1: Configurações -->
+        <div class="bg-white rounded-lg shadow overflow-hidden step-card" data-step="1">
+            <button onclick="toggleStep(1)" class="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-lg">1</div>
+                    <div class="text-left">
+                        <h3 class="font-bold text-gray-800">⚙️ Configurações da Empresa</h3>
+                        <p class="text-sm text-gray-500">Dados da empresa, cláusulas do contrato, WhatsApp</p>
+                    </div>
+                </div>
+                <span class="text-gray-400 step-arrow">▼</span>
+            </button>
+            <div id="step-1" class="hidden border-t px-5 py-4 bg-gray-50">
+                <div class="space-y-4 text-sm text-gray-700">
+                    <p><strong>O que fazer:</strong> Configure os dados que aparecerão nos comprovantes de locação.</p>
+
+                    <div class="bg-white rounded-lg p-4 border">
+                        <h4 class="font-bold mb-2">📋 Instruções:</h4>
+                        <ol class="list-decimal list-inside space-y-2">
+                            <li>No menu lateral, clique em <strong>⚙️ Configurações</strong></li>
+                            <li>Preencha o <strong>Nome da Empresa</strong> e <strong>CNPJ</strong></li>
+                            <li>Adicione <strong>Telefone</strong> e <strong>Endereço</strong></li>
+                            <li>Na seção "Cláusulas do Contrato", escreva:
+                                <ul class="list-disc list-inside ml-4 mt-1 text-gray-500">
+                                    <li>Cláusulas gerais de responsabilidade</li>
+                                    <li>Condições de devolução</li>
+                                    <li>Termos de multa por atraso/dano</li>
+                                </ul>
+                            </li>
+                            <li>Clique <strong>Salvar</strong></li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <p class="text-blue-800 text-xs">💡 <strong>Dica:</strong> As cláusulas serão impressas automaticamente no comprovante PDF de cada locação.</p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <a href="{% url 'tenants:settings_general' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm">Ir para Configurações →</a>
+                        <button onclick="markDone(1)" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm done-btn">✓ Concluído</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASSO 2: Equipamentos -->
+        <div class="bg-white rounded-lg shadow overflow-hidden step-card" data-step="2">
+            <button onclick="toggleStep(2)" class="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center font-bold text-lg">2</div>
+                    <div class="text-left">
+                        <h3 class="font-bold text-gray-800">🔧 Cadastro de Equipamentos</h3>
+                        <p class="text-sm text-gray-500">Registre suas máquinas com código, preços e categoria</p>
+                    </div>
+                </div>
+                <span class="text-gray-400 step-arrow">▼</span>
+            </button>
+            <div id="step-2" class="hidden border-t px-5 py-4 bg-gray-50">
+                <div class="space-y-4 text-sm text-gray-700">
+                    <p><strong>O que fazer:</strong> Cadastre cada equipamento individualmente com seu código de patrimônio.</p>
+
+                    <div class="bg-white rounded-lg p-4 border">
+                        <h4 class="font-bold mb-2">📋 Instruções:</h4>
+                        <ol class="list-decimal list-inside space-y-2">
+                            <li>Vá em <strong>🔧 Equipamentos</strong> → <strong>+ Novo Equipamento</strong></li>
+                            <li>Preencha o <strong>Código Patrimônio</strong> (ex: BET-001, AND-001)</li>
+                            <li>Informe o <strong>Nome</strong> (ex: Betoneira 400L)</li>
+                            <li>Selecione a <strong>Categoria</strong> (Andaime, Betoneira, Compactador, etc.)</li>
+                            <li>Defina os valores:
+                                <ul class="list-disc list-inside ml-4 mt-1 text-gray-500">
+                                    <li><strong>Diária:</strong> valor por dia</li>
+                                    <li><strong>Semanal:</strong> valor por semana</li>
+                                    <li><strong>Mensal:</strong> valor por mês</li>
+                                </ul>
+                            </li>
+                            <li>Estado inicial: <strong>Disponível</strong></li>
+                            <li>Clique <strong>Salvar</strong></li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <p class="text-blue-800 text-xs">💡 <strong>Dica:</strong> Cada unidade física deve ter seu próprio cadastro. Se você tem 3 betoneiras iguais, cadastre BET-001, BET-002 e BET-003.</p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <a href="{% url 'inventory:equipment_create' %}" class="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition text-sm">Cadastrar Equipamento →</a>
+                        <button onclick="markDone(2)" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm done-btn">✓ Concluído</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASSO 3: Clientes -->
+        <div class="bg-white rounded-lg shadow overflow-hidden step-card" data-step="3">
+            <button onclick="toggleStep(3)" class="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold text-lg">3</div>
+                    <div class="text-left">
+                        <h3 class="font-bold text-gray-800">👥 Cadastro de Clientes</h3>
+                        <p class="text-sm text-gray-500">Cadastre seus clientes com dados completos</p>
+                    </div>
+                </div>
+                <span class="text-gray-400 step-arrow">▼</span>
+            </button>
+            <div id="step-3" class="hidden border-t px-5 py-4 bg-gray-50">
+                <div class="space-y-4 text-sm text-gray-700">
+                    <p><strong>O que fazer:</strong> Cadastre os clientes que vão alugar seus equipamentos.</p>
+
+                    <div class="bg-white rounded-lg p-4 border">
+                        <h4 class="font-bold mb-2">📋 Instruções:</h4>
+                        <ol class="list-decimal list-inside space-y-2">
+                            <li>Vá em <strong>👥 Clientes</strong> → <strong>+ Novo Cliente</strong></li>
+                            <li>Escolha <strong>Pessoa Física</strong> ou <strong>Jurídica</strong></li>
+                            <li>Preencha: Nome, CPF/CNPJ, RG</li>
+                            <li>Informe os telefones e <strong>WhatsApp</strong> (importante para envio de comprovantes)</li>
+                            <li>Preencha o <strong>Endereço completo</strong></li>
+                            <li>Se souber, adicione o <strong>Endereço de Entrega/Obra</strong></li>
+                            <li>Cadastre pelo menos 1 <strong>Referência</strong> (nome + telefone)</li>
+                            <li>Defina <strong>Limite de Crédito</strong> e <strong>Condição de Pagamento</strong></li>
+                            <li>Clique <strong>Salvar</strong></li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <p class="text-blue-800 text-xs">💡 <strong>Dica:</strong> O WhatsApp é usado para enviar comprovantes e promoções. Preencha no formato (34) 9 8826-7096.</p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <a href="{% url 'customers:customer_create' %}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm">Cadastrar Cliente →</a>
+                        <button onclick="markDone(3)" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm done-btn">✓ Concluído</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASSO 4: Locação -->
+        <div class="bg-white rounded-lg shadow overflow-hidden step-card" data-step="4">
+            <button onclick="toggleStep(4)" class="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">4</div>
+                    <div class="text-left">
+                        <h3 class="font-bold text-gray-800">📋 Criar uma Locação</h3>
+                        <p class="text-sm text-gray-500">Registre uma nova locação de equipamentos</p>
+                    </div>
+                </div>
+                <span class="text-gray-400 step-arrow">▼</span>
+            </button>
+            <div id="step-4" class="hidden border-t px-5 py-4 bg-gray-50">
+                <div class="space-y-4 text-sm text-gray-700">
+                    <p><strong>O que fazer:</strong> Crie a locação selecionando cliente, equipamentos e período.</p>
+
+                    <div class="bg-white rounded-lg p-4 border">
+                        <h4 class="font-bold mb-2">📋 Instruções:</h4>
+                        <ol class="list-decimal list-inside space-y-2">
+                            <li>Vá em <strong>📋 Locações</strong> → <strong>+ Nova Locação</strong></li>
+                            <li>Selecione o <strong>Cliente</strong></li>
+                            <li>Escolha o <strong>Tipo de Período</strong> (Diária, Semanal ou Mensal)</li>
+                            <li>A <strong>Data de Início</strong> já vem preenchida com hoje</li>
+                            <li>Defina a <strong>Devolução Prevista</strong></li>
+                            <li>Selecione a <strong>Forma de Pagamento</strong> (PIX, Dinheiro, Cartão, A Receber)</li>
+                            <li>Na seção <strong>Equipamentos</strong>, selecione os itens disponíveis</li>
+                            <li>Deixe "Valor Unit." em branco para usar o preço da tabela</li>
+                            <li>Preencha o <strong>Endereço de Entrega</strong> (aparecerá no mapa)</li>
+                            <li>Clique <strong>✅ Criar Locação</strong></li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                        <p class="text-yellow-800 text-xs">⚠️ <strong>Importante:</strong> Após criar, você pode <strong>Imprimir o comprovante</strong> (PDF) e <strong>Enviar via WhatsApp</strong> na tela de detalhes da locação.</p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <a href="{% url 'rentals:rental_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm">Criar Locação →</a>
+                        <button onclick="markDone(4)" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm done-btn">✓ Concluído</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASSO 5: Fluxo de Caixa -->
+        <div class="bg-white rounded-lg shadow overflow-hidden step-card" data-step="5">
+            <button onclick="toggleStep(5)" class="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg">5</div>
+                    <div class="text-left">
+                        <h3 class="font-bold text-gray-800">💰 Fluxo de Caixa</h3>
+                        <p class="text-sm text-gray-500">Controle de entradas e saídas financeiras</p>
+                    </div>
+                </div>
+                <span class="text-gray-400 step-arrow">▼</span>
+            </button>
+            <div id="step-5" class="hidden border-t px-5 py-4 bg-gray-50">
+                <div class="space-y-4 text-sm text-gray-700">
+                    <p><strong>O que fazer:</strong> O sistema registra entradas automaticamente ao devolver locações. Registre saídas manualmente.</p>
+
+                    <div class="bg-white rounded-lg p-4 border">
+                        <h4 class="font-bold mb-2">📋 Como funciona:</h4>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li><strong>Entradas automáticas:</strong> Ao registrar a devolução de uma locação, o valor é lançado automaticamente como entrada</li>
+                            <li><strong>Saídas manuais:</strong> Registre despesas (combustível, manutenção, peças, etc.)</li>
+                            <li><strong>Filtro por período:</strong> Veja o saldo de qualquer período</li>
+                        </ul>
+
+                        <h4 class="font-bold mt-4 mb-2">Para registrar uma despesa:</h4>
+                        <ol class="list-decimal list-inside space-y-2">
+                            <li>Vá em <strong>💰 Financeiro</strong> → <strong>+ Nova Transação</strong></li>
+                            <li>Tipo: <strong>Saída</strong></li>
+                            <li>Informe Valor, Descrição e Data</li>
+                            <li>Clique <strong>Salvar</strong></li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <p class="text-blue-800 text-xs">💡 <strong>Dica:</strong> Para ver o resumo do mês, use o filtro de datas na tela do Financeiro.</p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <a href="{% url 'finance:dashboard' %}" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition text-sm">Ver Financeiro →</a>
+                        <button onclick="markDone(5)" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm done-btn">✓ Concluído</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASSO 6: Alertas e Notificações -->
+        <div class="bg-white rounded-lg shadow overflow-hidden step-card" data-step="6">
+            <button onclick="toggleStep(6)" class="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-lg">6</div>
+                    <div class="text-left">
+                        <h3 class="font-bold text-gray-800">🔔 Alertas e Notificações</h3>
+                        <p class="text-sm text-gray-500">Configure alertas automáticos para não perder prazos</p>
+                    </div>
+                </div>
+                <span class="text-gray-400 step-arrow">▼</span>
+            </button>
+            <div id="step-6" class="hidden border-t px-5 py-4 bg-gray-50">
+                <div class="space-y-4 text-sm text-gray-700">
+                    <p><strong>O que fazer:</strong> Configure regras para receber alertas quando algo precisar de atenção.</p>
+
+                    <div class="bg-white rounded-lg p-4 border">
+                        <h4 class="font-bold mb-2">📋 Instruções:</h4>
+                        <ol class="list-decimal list-inside space-y-2">
+                            <li>Vá em <strong>🔔 Notificações</strong> → <strong>⚙️ Configurar Alertas</strong></li>
+                            <li>Clique <strong>+ Nova Regra</strong></li>
+                            <li>Escolha o tipo de alerta:
+                                <ul class="list-disc list-inside ml-4 mt-1 text-gray-500">
+                                    <li><strong>Locação Atrasada</strong> — avisa quando cliente não devolveu</li>
+                                    <li><strong>Pagamento Pendente</strong> — locações não pagas</li>
+                                    <li><strong>Poucos Disponíveis</strong> — estoque baixo</li>
+                                    <li><strong>Despesa Alta</strong> — gastos acima do limite</li>
+                                </ul>
+                            </li>
+                            <li>Defina o <strong>Threshold</strong> (ex: 1 dia de atraso, 5 equipamentos mínimo)</li>
+                            <li>Escolha o <strong>Canal</strong>: Sistema (painel) ou WhatsApp do admin</li>
+                            <li>Clique <strong>Salvar</strong></li>
+                        </ol>
+
+                        <h4 class="font-bold mt-4 mb-2">Para verificar alertas:</h4>
+                        <ul class="list-disc list-inside space-y-1">
+                            <li>Clique em <strong>🔍 Verificar Agora</strong> na tela de notificações</li>
+                            <li>Os alertas aparecem no <strong>Dashboard</strong> e na tela de <strong>🔔 Notificações</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <p class="text-blue-800 text-xs">💡 <strong>Dica:</strong> Configure o WhatsApp em ⚙️ Configurações → WhatsApp para receber alertas críticos direto no celular.</p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <a href="{% url 'alerts:setup' %}" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition text-sm">Configurar Alertas →</a>
+                        <button onclick="markDone(6)" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm done-btn">✓ Concluído</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final -->
+    <div id="all-done" class="hidden bg-green-50 border border-green-200 rounded-lg p-8 mt-8 text-center">
+        <div class="text-5xl mb-4">🎉</div>
+        <h3 class="text-2xl font-bold text-green-800 mb-2">Parabéns! Setup completo!</h3>
+        <p class="text-green-700 mb-4">Seu sistema está pronto para uso. Acesse o Dashboard para começar a gerenciar suas locações.</p>
+        <a href="{% url 'tenants:dashboard' %}" class="inline-block bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition font-medium">Ir para o Dashboard →</a>
+    </div>
+</div>
+
+<script>
+// State
+let completed = JSON.parse(localStorage.getItem('locamaq_guide_steps') || '[]');
+
+// Init
+document.addEventListener('DOMContentLoaded', function() {
+    updateProgress();
+    completed.forEach(step => {
+        const card = document.querySelector(`[data-step="${step}"]`);
+        if (card) card.classList.add('opacity-60');
+    });
+});
+
+function toggleStep(n) {
+    const el = document.getElementById('step-' + n);
+    el.classList.toggle('hidden');
+}
+
+function markDone(n) {
+    if (!completed.includes(n)) {
+        completed.push(n);
+        localStorage.setItem('locamaq_guide_steps', JSON.stringify(completed));
+    }
+    const card = document.querySelector(`[data-step="${n}"]`);
+    card.classList.add('opacity-60');
+    document.getElementById('step-' + n).classList.add('hidden');
+    updateProgress();
+}
+
+function updateProgress() {
+    const total = 6;
+    const done = completed.length;
+    const pct = Math.round((done / total) * 100);
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = done + ' de ' + total + ' concluídos';
+
+    if (done >= total) {
+        document.getElementById('all-done').classList.remove('hidden');
+    }
+}
+</script>
+{% endblock %}
