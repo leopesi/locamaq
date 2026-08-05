@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}{{ customer.name }} — LocaMaq{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">{{ customer.name }}</h1>
+        {% if customer.trade_name %}<p class="text-gray-500">{{ customer.trade_name }}</p>{% endif %}
+    </div>
+    <div class="flex gap-2">
+        <a href="{% url 'customers:customer_update' customer.pk %}"
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Editar</a>
+        <a href="{% url 'customers:customer_list' %}"
+           class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition">Voltar</a>
+    </div>
+</div>
+
+{% if customer.is_blocked %}
+<div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+    <p class="text-red-800 font-medium">⚠️ Cliente BLOQUEADO{% if customer.block_reason %} — {{ customer.block_reason }}{% endif %}</p>
+</div>
+{% endif %}
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Identificação + Contato -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">📋 Identificação</h2>
+        <dl class="space-y-2">
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">Tipo</dt>
+                <dd class="text-sm font-medium">{{ customer.get_person_type_display }}</dd>
+            </div>
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">CPF/CNPJ</dt>
+                <dd class="text-sm font-medium">{{ customer.document|default:"—" }}</dd>
+            </div>
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">RG/IE</dt>
+                <dd class="text-sm font-medium">{{ customer.rg|default:"—" }}</dd>
+            </div>
+        </dl>
+
+        <h3 class="text-md font-semibold text-gray-800 mt-6 mb-3 border-b pb-2">📞 Contato</h3>
+        <dl class="space-y-2">
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">Telefone</dt>
+                <dd class="text-sm font-medium">{{ customer.phone|default:"—" }}</dd>
+            </div>
+            {% if customer.phone2 %}
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">Telefone 2</dt>
+                <dd class="text-sm font-medium">{{ customer.phone2 }}</dd>
+            </div>
+            {% endif %}
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">WhatsApp</dt>
+                <dd class="text-sm font-medium">{{ customer.whatsapp|default:"—" }}</dd>
+            </div>
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">E-mail</dt>
+                <dd class="text-sm font-medium">{{ customer.email|default:"—" }}</dd>
+            </div>
+        </dl>
+    </div>
+
+    <!-- Endereço -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">📍 Endereço</h2>
+        <p class="text-sm">{{ customer.full_address|default:"Não informado" }}</p>
+        {% if customer.zip_code %}<p class="text-xs text-gray-500 mt-1">CEP: {{ customer.zip_code }}</p>{% endif %}
+
+        {% if customer.delivery_address %}
+        <h3 class="text-md font-semibold text-gray-800 mt-6 mb-3 border-b pb-2">🚚 Entrega/Obra</h3>
+        <p class="text-sm">{{ customer.full_delivery_address }}</p>
+        {% if customer.delivery_reference %}<p class="text-xs text-gray-500 mt-1">Ref: {{ customer.delivery_reference }}</p>{% endif %}
+        {% if customer.site_contact_name %}
+        <p class="text-sm mt-2"><strong>Responsável:</strong> {{ customer.site_contact_name }} — {{ customer.site_contact_phone }}</p>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- Referências -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">👤 Referências</h2>
+        <dl class="space-y-2">
+            {% if customer.reference1_name %}
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">Referência 1</dt>
+                <dd class="text-sm font-medium">{{ customer.reference1_name }} — {{ customer.reference1_phone }}</dd>
+            </div>
+            {% endif %}
+            {% if customer.reference2_name %}
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">Referência 2</dt>
+                <dd class="text-sm font-medium">{{ customer.reference2_name }} — {{ customer.reference2_phone }}</dd>
+            </div>
+            {% endif %}
+            {% if not customer.reference1_name and not customer.reference2_name %}
+            <p class="text-sm text-gray-500">Nenhuma referência cadastrada.</p>
+            {% endif %}
+        </dl>
+
+        <h3 class="text-md font-semibold text-gray-800 mt-6 mb-3 border-b pb-2">💰 Financeiro</h3>
+        <dl class="space-y-2">
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">Limite de Crédito</dt>
+                <dd class="text-sm font-medium">R$ {{ customer.credit_limit }}</dd>
+            </div>
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">Condição de Pagamento</dt>
+                <dd class="text-sm font-medium">{{ customer.payment_terms|default:"Não definida" }}</dd>
+            </div>
+        </dl>
+    </div>
+
+    <!-- Últimas Locações -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">📋 Últimas Locações</h2>
+        {% if rentals %}
+        <div class="space-y-3">
+            {% for rental in rentals %}
+            <div class="border rounded-lg p-3">
+                <div class="flex justify-between items-center">
+                    <a href="{% url 'rentals:rental_detail' rental.pk %}" class="font-medium text-blue-600 hover:underline">Locação #{{ rental.pk }}</a>
+                    <span class="px-2 py-1 text-xs rounded-full
+                        {% if rental.status == 'active' %}bg-green-100 text-green-800
+                        {% elif rental.status == 'returned' %}bg-gray-100 text-gray-800
+                        {% elif rental.status == 'overdue' %}bg-red-100 text-red-800
+                        {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                        {{ rental.get_status_display }}
+                    </span>
+                </div>
+                <div class="text-sm text-gray-500 mt-1">
+                    {{ rental.start_date|date:"d/m/Y" }} → {{ rental.expected_return|date:"d/m/Y" }}
+                    | R$ {{ rental.total_value }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 text-sm">Nenhuma locação registrada.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if customer.notes %}
+<div class="bg-white rounded-lg shadow p-6 mt-6">
+    <h2 class="text-lg font-semibold text-gray-800 mb-3">📝 Observações</h2>
+    <p class="text-gray-600 whitespace-pre-line">{{ customer.notes }}</p>
+</div>
+{% endif %}
+{% endblock %}

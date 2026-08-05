@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}WhatsApp — Configurações — LocaMaq{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">⚙️ Configurações do WhatsApp</h1>
+
+    <!-- Tabs -->
+    <div class="flex gap-2 mb-6">
+        <a href="{% url 'tenants:settings_general' %}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">Empresa</a>
+        <a href="{% url 'tenants:settings_whatsapp' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg">WhatsApp</a>
+    </div>
+
+    {% if connection_status %}
+    <div class="mb-6 p-4 rounded-lg {% if connection_status.ok %}bg-green-50 border border-green-200{% else %}bg-red-50 border border-red-200{% endif %}">
+        {% if connection_status.ok %}
+        <p class="text-green-800"><strong>✅ Conectado!</strong> {{ connection_status.data }}</p>
+        {% else %}
+        <p class="text-red-800"><strong>❌ Falha na conexão:</strong> {{ connection_status.error }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">📱 Evolution API</h2>
+            <p class="text-sm text-gray-500 mb-4">Configure a conexão com a Evolution API para enviar mensagens via WhatsApp.</p>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">URL da API</label>
+                    {{ form.evolution_api_url }}
+                    <p class="text-xs text-gray-400 mt-1">Endereço completo da Evolution API (ex: https://evolution.seudominio.com)</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">API Key</label>
+                    {{ form.evolution_api_key }}
+                    <p class="text-xs text-gray-400 mt-1">Chave de autenticação configurada na Evolution API</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nome da Instância</label>
+                    {{ form.evolution_instance }}
+                    <p class="text-xs text-gray-400 mt-1">Nome da instância WhatsApp cadastrada na Evolution API</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-3">
+            <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition font-medium">
+                Salvar
+            </button>
+            <a href="{% url 'tenants:settings_whatsapp' %}?test=1" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-medium">
+                🔌 Testar Conexão
+            </a>
+        </div>
+    </form>
+
+    <!-- Help -->
+    <div class="mt-6 bg-gray-50 border rounded-lg p-6">
+        <h3 class="font-semibold text-gray-800 mb-3">💡 Como configurar</h3>
+        <ol class="list-decimal list-inside space-y-2 text-sm text-gray-600">
+            <li>Instale a <a href="https://github.com/EvolutionAPI/evolution-api" target="_blank" class="text-blue-600 hover:underline">Evolution API</a> (Docker recomendado)</li>
+            <li>Crie uma instância e conecte o WhatsApp via QR Code</li>
+            <li>Copie a URL, API Key e nome da instância para os campos acima</li>
+            <li>Clique em "Testar Conexão" para validar</li>
+        </ol>
+    </div>
+</div>
+{% endblock %}

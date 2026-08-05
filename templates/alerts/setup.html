@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Configurar Alertas — LocaMaq{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">⚙️ Configurar Alertas</h1>
+        <a href="{% url 'alerts:rule_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">+ Nova Regra</a>
+    </div>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <p class="text-sm text-blue-800">
+            <strong>💡 Como funciona:</strong> Configure regras de alerta e o sistema verificará automaticamente as condições.
+            Cada regra pode notificar apenas no painel ou também via WhatsApp.
+            O "Threshold" define o limite (ex: dias de atraso, quantidade mínima, valor máximo).
+        </p>
+    </div>
+
+    {% if rules %}
+    <div class="space-y-3">
+        {% for rule in rules %}
+        <div class="bg-white rounded-lg shadow p-5 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex-1 min-w-48">
+                <div class="flex items-center gap-2">
+                    {% if rule.severity == 'critical' %}<span>🔴</span>{% elif rule.severity == 'warning' %}<span>🟡</span>{% else %}<span>🔵</span>{% endif %}
+                    <h3 class="font-semibold text-gray-800">{{ rule.get_alert_type_display }}</h3>
+                    {% if not rule.is_active %}<span class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">Inativo</span>{% endif %}
+                </div>
+                <div class="text-sm text-gray-500 mt-1">
+                    Severidade: <strong>{{ rule.get_severity_display }}</strong> |
+                    Threshold: <strong>{{ rule.threshold }}</strong> |
+                    Canal: <strong>{{ rule.get_notify_channel_display }}</strong>
+                    {% if rule.notify_phone %} | 📱 {{ rule.notify_phone }}{% endif %}
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'alerts:rule_edit' rule.pk %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Editar</a>
+                <a href="{% url 'alerts:rule_delete' rule.pk %}" class="text-red-600 hover:text-red-800 text-sm font-medium">Excluir</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white rounded-lg shadow p-8 text-center">
+        <div class="text-4xl mb-3">🔕</div>
+        <p class="text-gray-500 mb-4">Nenhuma regra de alerta configurada.</p>
+        <a href="{% url 'alerts:rule_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Criar Primeira Regra</a>
+    </div>
+    {% endif %}
+
+    <!-- Quick setup -->
+    <div class="mt-8 bg-gray-50 border rounded-lg p-6">
+        <h3 class="font-semibold text-gray-800 mb-3">📋 Tipos de Alerta Disponíveis</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <div class="flex items-start gap-2">
+                <span>⏰</span>
+                <div><strong>Locação Atrasada</strong><br><span class="text-gray-500">Threshold = dias de atraso tolerados</span></div>
+            </div>
+            <div class="flex items-start gap-2">
+                <span>🔧</span>
+                <div><strong>Equipamento em Manutenção</strong><br><span class="text-gray-500">Threshold = dias máximo em manutenção</span></div>
+            </div>
+            <div class="flex items-start gap-2">
+                <span>📉</span>
+                <div><strong>Poucos Disponíveis</strong><br><span class="text-gray-500">Threshold = quantidade mínima aceitável</span></div>
+            </div>
+            <div class="flex items-start gap-2">
+                <span>💸</span>
+                <div><strong>Pagamento Pendente</strong><br><span class="text-gray-500">Threshold = dias sem pagamento</span></div>
+            </div>
+            <div class="flex items-start gap-2">
+                <span>📊</span>
+                <div><strong>Despesa Alta no Mês</strong><br><span class="text-gray-500">Threshold = valor máximo em R$</span></div>
+            </div>
+            <div class="flex items-start gap-2">
+                <span>📱</span>
+                <div><strong>WhatsApp Desconectado</strong><br><span class="text-gray-500">Verifica conexão da Evolution API</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

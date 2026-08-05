@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Cancelar Locação — LocaMaq{% endblock %}
+
+{% block content %}
+<div class="max-w-lg">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Cancelar Locação #{{ rental.pk }}</h1>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p class="text-red-800">
+                Tem certeza que deseja cancelar esta locação?
+                Os equipamentos serão liberados, mas nenhuma transação financeira será gerada.
+            </p>
+        </div>
+
+        <form method="post" class="flex gap-3">
+            {% csrf_token %}
+            <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition">Sim, cancelar</button>
+            <a href="{% url 'rentals:rental_detail' rental.pk %}" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition">Voltar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

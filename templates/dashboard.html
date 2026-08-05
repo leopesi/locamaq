@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — LocaMaq{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Dashboard</h1>
+
+<!-- Cards de métricas (compactos) -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
+    <div class="bg-white rounded-lg shadow p-3 md:p-4 flex items-center gap-3">
+        <span class="text-2xl">🔧</span>
+        <div>
+            <p class="text-lg md:text-xl font-bold text-green-600">{{ available_count|default:"0" }}<span class="text-xs text-gray-400 font-normal">/{{ total_equipment|default:"0" }}</span></p>
+            <p class="text-xs text-gray-500">Disponíveis</p>
+        </div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-3 md:p-4 flex items-center gap-3">
+        <span class="text-2xl">📋</span>
+        <div>
+            <p class="text-lg md:text-xl font-bold text-blue-600">{{ active_rentals|default:"0" }}</p>
+            <p class="text-xs text-gray-500">Locações Ativas</p>
+        </div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-3 md:p-4 flex items-center gap-3">
+        <span class="text-2xl">💰</span>
+        <div>
+            <p class="text-lg md:text-xl font-bold text-emerald-600">R$ {{ monthly_revenue|default:"0.00" }}</p>
+            <p class="text-xs text-gray-500">Faturamento/Mês</p>
+        </div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-3 md:p-4 flex items-center gap-3">
+        <span class="text-2xl">⚠️</span>
+        <div>
+            <p class="text-lg md:text-xl font-bold {% if overdue_rentals %}text-red-600{% else %}text-gray-400{% endif %}">{{ overdue_rentals|default:"0" }}</p>
+            <p class="text-xs text-gray-500">Atrasadas</p>
+        </div>
+    </div>
+</div>
+
+<!-- Notificações (se houver) -->
+{% if recent_notifications %}
+<div class="bg-white rounded-lg shadow p-4 mb-6 border-l-4 border-red-500">
+    <div class="flex justify-between items-center mb-3">
+        <h2 class="font-bold text-gray-800">🔔 Alertas <span class="text-sm font-normal text-red-600">({{ unread_count }})</span></h2>
+        <a href="{% url 'alerts:notification_list' %}" class="text-blue-600 hover:underline text-xs">Ver todas →</a>
+    </div>
+    <div class="space-y-2">
+        {% for notif in recent_notifications %}
+        <div class="flex items-center gap-2 text-sm">
+            <span>{{ notif.severity_icon }}</span>
+            <span class="flex-1 truncate">{{ notif.title }}</span>
+            {% if notif.related_rental %}
+            <a href="{% url 'rentals:rental_detail' notif.related_rental.pk %}" class="text-blue-600 shrink-0">→</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- MAPA (prioridade visual) -->
+<div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
+    <div class="flex justify-between items-center mb-3">
+        <h2 class="text-lg font-bold text-gray-800">🗺️ Mapa de Máquinas</h2>
+        <button onclick="toggleFullscreen()" id="btn-fullscreen" class="bg-gray-700 text-white px-3 py-1 rounded-lg hover:bg-gray-800 transition text-sm">
+            ⛶ Tela Inteira
+        </button>
+    </div>
+    <div id="map-container" class="relative">
+        <button class="fullscreen-close" onclick="toggleFullscreen()">✕ Fechar</button>
+        <div id="map" class="w-full h-80 md:h-[500px] lg:h-[600px] rounded-lg border border-gray-200"></div>
+    </div>
+    <p class="text-xs text-gray-400 mt-2">🚨 = Atrasada | ⚠️ = Alerta | Ícones = tipo de equipamento</p>
+</div>
+
+<style>
+    #map-container.fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9999;
+        padding: 0;
+        background: white;
+    }
+    #map-container.fullscreen #map {
+        height: 100vh !important;
+        border-radius: 0;
+    }
+    #map-container.fullscreen .fullscreen-close {
+        display: block;
+    }
+    .fullscreen-close {
+        display: none;
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        z-index: 10000;
+        background: white;
+        border: 2px solid #333;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .fullscreen-close:hover {
+        background: #f3f4f6;
+    }
+</style>
+
+<script>
+function toggleFullscreen() {
+    const container = document.getElementById('map-container');
+    container.classList.toggle('fullscreen');
+    setTimeout(function() {
+        if (window._locamaqMap) window._locamaqMap.invalidateSize();
+    }, 200);
+}
+</script>
+
+<!-- Locações Recentes + Ações Rápidas -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <!-- Locações Recentes (2/3) -->
+    <div class="lg:col-span-2 bg-white rounded-lg shadow p-4 md:p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold text-gray-800">📋 Locações Recentes</h2>
+            <a href="{% url 'rentals:rental_list' %}" class="text-blue-600 hover:underline text-sm">Ver todas →</a>
+        </div>
+        {% if recent_rentals %}
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[450px]">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">#</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Valor</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for rental in recent_rentals %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-3 py-2"><a href="{% url 'rentals:rental_detail' rental.pk %}" class="text-blue-600 hover:underline font-medium">#{{ rental.pk }}</a></td>
+                        <td class="px-3 py-2 text-sm">{{ rental.customer.name }}</td>
+                        <td class="px-3 py-2">
+                            <span class="px-2 py-0.5 text-xs rounded-full
+                                {% if rental.status == 'active' %}bg-green-100 text-green-800
+                                {% elif rental.status == 'returned' %}bg-gray-100 text-gray-800
+                                {% elif rental.status == 'overdue' %}bg-red-100 text-red-800
+                                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {{ rental.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="px-3 py-2 font-medium text-sm">R$ {{ rental.total_value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-gray-500 text-sm">Nenhuma locação registrada.</p>
+        {% endif %}
+    </div>
+
+    <!-- Ações Rápidas (1/3) -->
+    <div class="bg-white rounded-lg shadow p-4 md:p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">⚡ Ações Rápidas</h2>
+        <div class="space-y-3">
+            <a href="{% url 'rentals:rental_create' %}" class="flex items-center gap-3 p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition">
+                <span class="text-xl">➕</span>
+                <span class="font-medium text-blue-800">Nova Locação</span>
+            </a>
+            <a href="{% url 'customers:customer_create' %}" class="flex items-center gap-3 p-3 rounded-lg bg-green-50 hover:bg-green-100 transition">
+                <span class="text-xl">👤</span>
+                <span class="font-medium text-green-800">Novo Cliente</span>
+            </a>
+            <a href="{% url 'inventory:equipment_create' %}" class="flex items-center gap-3 p-3 rounded-lg bg-yellow-50 hover:bg-yellow-100 transition">
+                <span class="text-xl">🔧</span>
+                <span class="font-medium text-yellow-800">Novo Equipamento</span>
+            </a>
+            <a href="{% url 'finance:transaction_create' %}" class="flex items-center gap-3 p-3 rounded-lg bg-purple-50 hover:bg-purple-100 transition">
+                <span class="text-xl">💰</span>
+                <span class="font-medium text-purple-800">Nova Transação</span>
+            </a>
+            <a href="{% url 'alerts:run_checks' %}" class="flex items-center gap-3 p-3 rounded-lg bg-red-50 hover:bg-red-100 transition">
+                <span class="text-xl">🔍</span>
+                <span class="font-medium text-red-800">Verificar Alertas</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Leaflet.js Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const markers = {{ map_markers_json|safe }};
+
+    let centerLat = -18.6486;
+    let centerLng = -48.1867;
+    let zoom = 13;
+
+    if (markers.length > 0) {
+        centerLat = markers[0].lat;
+        centerLng = markers[0].lng;
+    }
+
+    const map = L.map('map').setView([centerLat, centerLng], zoom);
+    window._locamaqMap = map;
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap',
+        maxZoom: 18,
+    }).addTo(map);
+
+    if (markers.length === 0) {
+        L.popup()
+            .setLatLng([centerLat, centerLng])
+            .setContent('<p style="color:#6b7280">Nenhuma locação ativa com endereço.</p>')
+            .openOn(map);
+        return;
+    }
+
+    // Custom icons by equipment category — using SVG
+    function makeIcon(svg, size) {
+        return L.divIcon({
+            className: '',
+            html: svg,
+            iconSize: [size || 36, size || 36],
+            iconAnchor: [(size||36)/2, size||36],
+            popupAnchor: [0, -(size||36)]
+        });
+    }
+
+    const icons = {
+        'Andaime': makeIcon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36"><rect x="12" y="8" width="4" height="52" fill="#f59e0b"/><rect x="48" y="8" width="4" height="52" fill="#f59e0b"/><rect x="12" y="16" width="40" height="4" fill="#d97706"/><rect x="12" y="32" width="40" height="4" fill="#d97706"/><rect x="12" y="48" width="40" height="4" fill="#d97706"/><line x1="16" y1="20" x2="48" y2="32" stroke="#92400e" stroke-width="2"/><line x1="48" y1="20" x2="16" y2="32" stroke="#92400e" stroke-width="2"/><line x1="16" y1="36" x2="48" y2="48" stroke="#92400e" stroke-width="2"/><line x1="48" y1="36" x2="16" y2="48" stroke="#92400e" stroke-width="2"/></svg>'),
+        'Escora': makeIcon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36"><rect x="12" y="8" width="4" height="52" fill="#f59e0b"/><rect x="48" y="8" width="4" height="52" fill="#f59e0b"/><rect x="12" y="16" width="40" height="4" fill="#d97706"/><rect x="12" y="32" width="40" height="4" fill="#d97706"/><rect x="12" y="48" width="40" height="4" fill="#d97706"/></svg>'),
+        'Betoneira': makeIcon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36"><ellipse cx="28" cy="30" rx="18" ry="16" fill="#6b7280" stroke="#374151" stroke-width="2"/><ellipse cx="28" cy="30" rx="12" ry="10" fill="#9ca3af"/><path d="M 44 24 L 56 16 L 56 20 L 46 28" fill="#4b5563"/><circle cx="20" cy="54" r="6" fill="#1f2937"/><circle cx="40" cy="54" r="6" fill="#1f2937"/><rect x="16" y="46" width="28" height="4" fill="#374151" rx="2"/></svg>'),
+        'Compactador': makeIcon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36"><rect x="16" y="20" width="32" height="24" rx="4" fill="#eab308" stroke="#a16207" stroke-width="2"/><rect x="12" y="44" width="40" height="12" rx="3" fill="#6b7280" stroke="#374151" stroke-width="2"/><rect x="24" y="10" width="4" height="12" fill="#374151"/><rect x="20" y="6" width="12" height="6" rx="2" fill="#1f2937"/></svg>'),
+        'Placa': makeIcon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36"><rect x="16" y="20" width="32" height="24" rx="4" fill="#eab308" stroke="#a16207" stroke-width="2"/><rect x="12" y="44" width="40" height="12" rx="3" fill="#6b7280" stroke="#374151" stroke-width="2"/></svg>'),
+        'Gerador': makeIcon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36"><rect x="10" y="18" width="44" height="32" rx="4" fill="#1e40af" stroke="#1e3a8a" stroke-width="2"/><path d="M 24 28 L 22 36 L 26 36 L 24 44" fill="#fbbf24" stroke="#f59e0b" stroke-width="1.5"/><circle cx="44" cy="34" r="6" fill="#1e3a8a" stroke="#fbbf24" stroke-width="2"/><rect x="10" y="50" width="10" height="6" rx="2" fill="#374151"/><rect x="44" y="50" width="10" height="6" rx="2" fill="#374151"/></svg>'),
+        'Bomba': makeIcon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36"><ellipse cx="32" cy="38" rx="16" ry="14" fill="#0ea5e9" stroke="#0284c7" stroke-width="2"/><rect x="28" y="10" width="8" height="16" rx="2" fill="#6b7280"/><ellipse cx="32" cy="38" rx="8" ry="6" fill="#38bdf8"/></svg>'),
+        'Martelete': makeIcon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36"><rect x="28" y="20" width="8" height="36" rx="2" fill="#f59e0b"/><rect x="22" y="8" width="20" height="16" rx="3" fill="#6b7280" stroke="#374151" stroke-width="2"/></svg>'),
+        'Serra': makeIcon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36"><circle cx="32" cy="32" r="20" fill="#9ca3af" stroke="#4b5563" stroke-width="2"/><circle cx="32" cy="32" r="4" fill="#374151"/></svg>'),
+        'Vibrador': makeIcon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36"><rect x="26" y="8" width="12" height="20" rx="4" fill="#f59e0b" stroke="#d97706" stroke-width="2"/><rect x="30" y="28" width="4" height="24" fill="#6b7280"/><ellipse cx="32" cy="56" rx="6" ry="4" fill="#374151"/></svg>'),
+        'Guincho': makeIcon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36"><rect x="28" y="16" width="8" height="40" fill="#f59e0b" stroke="#d97706" stroke-width="2"/><rect x="20" y="8" width="24" height="10" rx="3" fill="#6b7280" stroke="#374151" stroke-width="2"/></svg>'),
+        'Plataforma': makeIcon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36"><rect x="8" y="44" width="48" height="8" rx="2" fill="#f59e0b" stroke="#d97706" stroke-width="2"/><rect x="12" y="12" width="4" height="32" fill="#6b7280"/><rect x="48" y="12" width="4" height="32" fill="#6b7280"/></svg>'),
+        'default': makeIcon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36"><path d="M 32 4 C 20 4 12 14 12 24 C 12 40 32 60 32 60 C 32 60 52 40 52 24 C 52 14 44 4 32 4 Z" fill="#ef4444" stroke="#991b1b" stroke-width="2"/><circle cx="32" cy="24" r="8" fill="white"/></svg>'),
+    };
+
+    const alertIcon = makeIcon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36"><path d="M 32 4 L 60 56 L 4 56 Z" fill="#f59e0b" stroke="#d97706" stroke-width="2"/><text x="32" y="48" text-anchor="middle" font-size="28" font-weight="bold" fill="#78350f">!</text></svg>');
+    const overdueIcon = makeIcon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36"><circle cx="32" cy="32" r="28" fill="#ef4444" stroke="#991b1b" stroke-width="2"/><text x="32" y="42" text-anchor="middle" font-size="28" font-weight="bold" fill="white">!</text></svg>');
+
+    function getIcon(m) {
+        if (m.is_overdue) return overdueIcon;
+        if (m.has_alert) return alertIcon;
+        for (const key in icons) {
+            if (key !== 'default' && m.equipments.toLowerCase().includes(key.toLowerCase())) {
+                return icons[key];
+            }
+        }
+        return icons['default'];
+    }
+
+    const bounds = [];
+
+    markers.forEach(function(m) {
+        const icon = getIcon(m);
+        const marker = L.marker([m.lat, m.lng], {icon: icon}).addTo(map);
+        marker.bindPopup(
+            '<div style="min-width:220px">' +
+            (m.alert_text ? '<div style="background:#fee2e2;color:#991b1b;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:bold;margin-bottom:6px">⚠️ ' + m.alert_text + '</div>' : '') +
+            '<strong>' + m.title + '</strong><br>' +
+            '<small>📍 ' + m.address + '</small><br>' +
+            '<small>🔧 ' + m.equipments + '</small><br>' +
+            '<a href="/rentals/' + m.id + '/" style="color:#2563eb;font-size:12px">Ver locação →</a>' +
+            '</div>'
+        );
+        bounds.push([m.lat, m.lng]);
+    });
+
+    if (bounds.length > 1) {
+        map.fitBounds(bounds, { padding: [30, 30] });
+    }
+});
+</script>
+{% endblock %}

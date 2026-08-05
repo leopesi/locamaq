@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Excluir Regra — LocaMaq{% endblock %}
+
+{% block content %}
+<div class="max-w-lg">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Excluir Regra de Alerta</h1>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p class="text-red-800">
+                Excluir a regra <strong>{{ rule.get_alert_type_display }}</strong>?
+                Notificações existentes não serão removidas.
+            </p>
+        </div>
+
+        <form method="post" class="flex gap-3">
+            {% csrf_token %}
+            <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition">Sim, excluir</button>
+            <a href="{% url 'alerts:setup' %}" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

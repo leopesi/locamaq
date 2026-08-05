@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Configurações — LocaMaq{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">⚙️ Configurações da Empresa</h1>
+
+    <!-- Tabs -->
+    <div class="flex gap-2 mb-6">
+        <a href="{% url 'tenants:settings_general' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Empresa</a>
+        <a href="{% url 'tenants:settings_whatsapp' %}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">WhatsApp</a>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Dados da Empresa -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">🏢 Dados da Empresa</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nome da Empresa</label>
+                    {{ form.name }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">CNPJ</label>
+                    {{ form.document }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                    {{ form.phone }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                    {{ form.email }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Logo</label>
+                    {{ form.logo }}
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Endereço</label>
+                    {{ form.address }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Cláusulas do Contrato -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">📄 Cláusulas do Contrato (PDF)</h2>
+            <p class="text-sm text-gray-500 mb-4">Esses textos aparecem no comprovante de locação impresso (PDF).</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cláusulas Gerais</label>
+                    {{ form.contract_clauses }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Condições de Devolução</label>
+                    {{ form.return_conditions }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Termos de Multa</label>
+                    {{ form.penalty_terms }}
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition font-medium">
+            Salvar Configurações
+        </button>
+    </form>
+</div>
+{% endblock %}

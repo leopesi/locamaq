@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Financeiro — LocaMaq{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Fluxo de Caixa</h1>
+    <a href="{% url 'finance:transaction_create' %}"
+       class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+        + Nova Transação
+    </a>
+</div>
+
+<!-- Summary -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white rounded-lg shadow p-6 text-center">
+        <h3 class="text-sm text-gray-500 uppercase">Entradas</h3>
+        <p class="text-2xl font-bold text-green-600">R$ {{ income }}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6 text-center">
+        <h3 class="text-sm text-gray-500 uppercase">Saídas</h3>
+        <p class="text-2xl font-bold text-red-600">R$ {{ expense }}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6 text-center">
+        <h3 class="text-sm text-gray-500 uppercase">Saldo</h3>
+        <p class="text-2xl font-bold {% if balance >= 0 %}text-green-600{% else %}text-red-600{% endif %}">R$ {{ balance }}</p>
+    </div>
+</div>
+
+<!-- Date Filter -->
+<div class="mb-4">
+    <form method="get" class="flex flex-wrap gap-2 items-center">
+        <label class="text-sm text-gray-600">De:</label>
+        <input type="date" name="start" value="{{ start_date }}" class="px-3 py-2 border border-gray-300 rounded-lg">
+        <label class="text-sm text-gray-600">Até:</label>
+        <input type="date" name="end" value="{{ end_date }}" class="px-3 py-2 border border-gray-300 rounded-lg">
+        <button type="submit" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">Filtrar</button>
+    </form>
+</div>
+
+<!-- Transactions -->
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descrição</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Valor</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+            {% for t in transactions %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ t.date|date:"d/m/Y" }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    {% if t.type == 'income' %}
+                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Entrada</span>
+                    {% else %}
+                    <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Saída</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4">{{ t.description }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-right font-medium {% if t.type == 'income' %}text-green-600{% else %}text-red-600{% endif %}">
+                    {% if t.type == 'income' %}+{% else %}-{% endif %} R$ {{ t.value }}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="px-6 py-4 text-center text-gray-500">Nenhuma transação no período.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

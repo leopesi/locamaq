@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{{ equipment }} — LocaMaq{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">{{ equipment }}</h1>
+    <div class="flex gap-2">
+        <a href="{% url 'inventory:equipment_update' equipment.pk %}"
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Editar</a>
+        <a href="{% url 'inventory:equipment_list' %}"
+           class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition">Voltar</a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Info -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Informações</h2>
+        <dl class="space-y-3">
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">Código</dt>
+                <dd class="text-sm font-mono font-medium">{{ equipment.code }}</dd>
+            </div>
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">Categoria</dt>
+                <dd class="text-sm font-medium">{{ equipment.get_category_display }}</dd>
+            </div>
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">Estado</dt>
+                <dd>
+                    <span class="px-2 py-1 text-xs rounded-full
+                        {% if equipment.state == 'available' %}bg-green-100 text-green-800
+                        {% elif equipment.state == 'rented' %}bg-blue-100 text-blue-800
+                        {% elif equipment.state == 'maintenance' %}bg-yellow-100 text-yellow-800
+                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ equipment.get_state_display }}
+                    </span>
+                </dd>
+            </div>
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">Diária</dt>
+                <dd class="text-sm font-medium">R$ {{ equipment.daily_rate }}</dd>
+            </div>
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">Semanal</dt>
+                <dd class="text-sm font-medium">R$ {{ equipment.weekly_rate }}</dd>
+            </div>
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">Mensal</dt>
+                <dd class="text-sm font-medium">R$ {{ equipment.monthly_rate }}</dd>
+            </div>
+            {% if equipment.description %}
+            <div>
+                <dt class="text-sm text-gray-500">Descrição</dt>
+                <dd class="text-sm mt-1">{{ equipment.description }}</dd>
+            </div>
+            {% endif %}
+        </dl>
+    </div>
+
+    <!-- History -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Histórico de Estado</h2>
+        {% if history %}
+        <div class="space-y-3">
+            {% for entry in history %}
+            <div class="border-l-4 border-blue-400 pl-3 py-1">
+                <div class="text-sm font-medium">{{ entry.get_previous_state_display }} → {{ entry.get_new_state_display }}</div>
+                <div class="text-xs text-gray-500">{{ entry.created_at|date:"d/m/Y H:i" }} {% if entry.changed_by %}· {{ entry.changed_by.get_full_name|default:entry.changed_by.username }}{% endif %}</div>
+                {% if entry.notes %}<div class="text-xs text-gray-600 mt-1">{{ entry.notes }}</div>{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 text-sm">Nenhuma alteração de estado registrada.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

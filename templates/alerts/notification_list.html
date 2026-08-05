@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Notificações — LocaMaq{% endblock %}
+
+{% block content %}
+<div class="flex flex-wrap justify-between items-center mb-6 gap-3">
+    <div>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">🔔 Notificações</h1>
+        {% if unread_count %}<p class="text-sm text-red-600 mt-1">{{ unread_count }} não lida(s)</p>{% endif %}
+    </div>
+    <div class="flex gap-2 flex-wrap">
+        <a href="{% url 'alerts:run_checks' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm">🔍 Verificar Agora</a>
+        <a href="{% url 'alerts:mark_all_read' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition text-sm">✓ Marcar Todas como Lidas</a>
+        {% if user.is_admin %}
+        <a href="{% url 'alerts:setup' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm">⚙️ Configurar Alertas</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="mb-4 flex gap-2 flex-wrap">
+    <a href="{% url 'alerts:notification_list' %}" class="px-3 py-1 rounded-full text-sm {% if not severity_filter and not status_filter %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-700{% endif %}">Todas</a>
+    <a href="?severity=critical" class="px-3 py-1 rounded-full text-sm {% if severity_filter == 'critical' %}bg-red-600 text-white{% else %}bg-gray-200 text-gray-700{% endif %}">🔴 Crítico</a>
+    <a href="?severity=warning" class="px-3 py-1 rounded-full text-sm {% if severity_filter == 'warning' %}bg-yellow-600 text-white{% else %}bg-gray-200 text-gray-700{% endif %}">🟡 Alerta</a>
+    <a href="?severity=info" class="px-3 py-1 rounded-full text-sm {% if severity_filter == 'info' %}bg-blue-500 text-white{% else %}bg-gray-200 text-gray-700{% endif %}">🔵 Info</a>
+    <a href="?status=unread" class="px-3 py-1 rounded-full text-sm {% if status_filter == 'unread' %}bg-gray-800 text-white{% else %}bg-gray-200 text-gray-700{% endif %}">Não Lidas</a>
+</div>
+
+<!-- Notification list -->
+<div class="space-y-3">
+    {% for notif in notifications %}
+    <div class="bg-white rounded-lg shadow p-4 border-l-4
+        {% if notif.severity == 'critical' %}border-red-500{% elif notif.severity == 'warning' %}border-yellow-500{% else %}border-blue-500{% endif %}
+        {% if notif.status == 'unread' %}ring-2 ring-blue-100{% endif %}">
+        <div class="flex justify-between items-start">
+            <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-lg">{{ notif.severity_icon }}</span>
+                    <h3 class="font-semibold text-gray-800 {% if notif.status == 'unread' %}text-black{% endif %}">{{ notif.title }}</h3>
+                    {% if notif.whatsapp_sent %}<span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">📱 WhatsApp</span>{% endif %}
+                </div>
+                <p class="text-sm text-gray-600 whitespace-pre-line">{{ notif.message }}</p>
+                <div class="flex gap-3 mt-2 text-xs text-gray-400">
+                    <span>{{ notif.created_at|date:"d/m/Y H:i" }}</span>
+                    <span>{{ notif.get_alert_type_display }}</span>
+                    {% if notif.status == 'unread' %}<span class="text-blue-600 font-medium">● Nova</span>{% endif %}
+                </div>
+            </div>
+            <div class="flex gap-1 ml-3">
+                {% if notif.related_rental %}
+                <a href="{% url 'rentals:rental_detail' notif.related_rental.pk %}" class="text-blue-600 hover:text-blue-800 text-sm" title="Ver locação">📋</a>
+                {% endif %}
+                {% if notif.status == 'unread' %}
+                <a href="{% url 'alerts:mark_read' notif.pk %}" class="text-green-600 hover:text-green-800 text-sm" title="Marcar como lida">✓</a>
+                {% endif %}
+                <a href="{% url 'alerts:dismiss' notif.pk %}" class="text-gray-400 hover:text-gray-600 text-sm" title="Dispensar">✕</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="bg-white rounded-lg shadow p-8 text-center">
+        <div class="text-4xl mb-3">✅</div>
+        <p class="text-gray-500">Nenhuma notificação. Tudo em ordem!</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Adicionar Equipamentos — Locação #{{ rental.pk }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl">
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">Locação #{{ rental.pk }}</h1>
+    <p class="text-gray-600 mb-6">Cliente: {{ rental.customer.name }} | {{ rental.get_period_type_display }} | {{ rental.start_date|date:"d/m/Y" }} → {{ rental.expected_return|date:"d/m/Y" }}</p>
+
+    <!-- Items already added -->
+    {% if items %}
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Equipamentos na Locação</h2>
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Equipamento</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Qtd</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Valor Unit.</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for item in items %}
+                <tr>
+                    <td class="px-4 py-2">{{ item.equipment }}</td>
+                    <td class="px-4 py-2">{{ item.quantity }}</td>
+                    <td class="px-4 py-2">R$ {{ item.unit_value }}</td>
+                    <td class="px-4 py-2">R$ {{ item.calculate_value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="bg-gray-50">
+                <tr>
+                    <td colspan="3" class="px-4 py-2 font-bold text-right">Total:</td>
+                    <td class="px-4 py-2 font-bold">R$ {{ rental.total_value }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Add new item -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Adicionar Equipamento</h2>
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<p class="text-gray-400 text-xs mt-1">{{ field.help_text }}</p>{% endif %}
+                {% if field.errors %}<p class="text-red-500 text-sm mt-1">{{ field.errors.0 }}</p>{% endif %}
+            </div>
+            {% endfor %}
+            <p class="text-sm text-gray-500">Deixe "valor unitário" em 0 para usar o valor da tabela de preços.</p>
+            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">+ Adicionar</button>
+        </form>
+    </div>
+
+    <div class="flex gap-3">
+        <a href="{% url 'rentals:rental_detail' rental.pk %}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">Finalizar</a>
+        <a href="{% url 'rentals:rental_list' %}" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition">Voltar</a>
+    </div>
+</div>
+{% endblock %}
