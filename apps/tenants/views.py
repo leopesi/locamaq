@@ -16,6 +16,13 @@ from decimal import Decimal
 from .forms import TenantSettingsForm, EvolutionAPIForm
 
 
+def home(request):
+    """Landing page for visitors, redirect to dashboard for logged users."""
+    if request.user.is_authenticated:
+        return redirect('tenants:dashboard')
+    return render(request, 'landing.html')
+
+
 @login_required
 def dashboard(request):
     """Main dashboard view with real metrics. Cached per tenant (60s)."""

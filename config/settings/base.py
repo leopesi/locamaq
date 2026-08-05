@@ -239,8 +239,8 @@ LOGGING = {
 
 # Login
 LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
 
 # Evolution API (WhatsApp)
 EVOLUTION_API_URL = config('EVOLUTION_API_URL', default='http://localhost:8080')

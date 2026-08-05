@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construara — Locadora de Máquinas para Construção | Araguari MG</title>
+    <meta name="description" content="Construara - Locação de máquinas e equipamentos para construção civil em Araguari/MG. Desde 1994 oferecendo betoneiras, andaimes, compactadores e mais.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#fef7ed', 100: '#fdecd4', 200: '#f9d5a8', 400: '#f4a940', 500: '#f59e0b', 600: '#d97706', 700: '#b45309', 800: '#92400e', 900: '#78350f' },
+                        dark: { 800: '#1e293b', 900: '#0f172a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        .hero-bg {
+            background: linear-gradient(135deg, rgba(15,23,42,0.9) 0%, rgba(30,41,59,0.85) 100%),
+                        url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1920&q=80') center/cover;
+        }
+        .fade-in { animation: fadeIn 0.8s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-white">
+
+    <!-- NAVBAR -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">🏗️</span>
+                    <div>
+                        <h1 class="text-white font-bold text-lg leading-tight">Construara</h1>
+                        <p class="text-gray-400 text-xs">Locadora de Máquinas</p>
+                    </div>
+                </div>
+
+                <!-- Desktop menu -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#inicio" class="text-gray-300 hover:text-white transition text-sm">Início</a>
+                    <a href="#servicos" class="text-gray-300 hover:text-white transition text-sm">Serviços</a>
+                    <a href="#equipamentos" class="text-gray-300 hover:text-white transition text-sm">Equipamentos</a>
+                    <a href="#sobre" class="text-gray-300 hover:text-white transition text-sm">Sobre</a>
+                    <a href="#contato" class="text-gray-300 hover:text-white transition text-sm">Contato</a>
+                    <a href="/accounts/login/" class="bg-brand-500 text-white px-5 py-2 rounded-lg hover:bg-brand-600 transition font-medium text-sm">
+                        Área do Cliente
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center gap-3">
+                    <a href="/accounts/login/" class="bg-brand-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium">Login</a>
+                    <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="text-white text-2xl">☰</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-dark-900 border-t border-gray-800 pb-4">
+            <a href="#inicio" class="block px-6 py-3 text-gray-300 hover:text-white">Início</a>
+            <a href="#servicos" class="block px-6 py-3 text-gray-300 hover:text-white">Serviços</a>
+            <a href="#equipamentos" class="block px-6 py-3 text-gray-300 hover:text-white">Equipamentos</a>
+            <a href="#sobre" class="block px-6 py-3 text-gray-300 hover:text-white">Sobre</a>
+            <a href="#contato" class="block px-6 py-3 text-gray-300 hover:text-white">Contato</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="inicio" class="hero-bg min-h-screen flex items-center pt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="max-w-3xl fade-in">
+                <span class="inline-block bg-brand-500/20 text-brand-400 px-4 py-1 rounded-full text-sm font-medium mb-6">
+                    Desde 1994 em Araguari/MG
+                </span>
+                <h2 class="text-4xl md:text-6xl font-bold text-white leading-tight mb-6">
+                    Locação de Máquinas para
+                    <span class="text-brand-400">Construção Civil</span>
+                </h2>
+                <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+                    Betoneiras, andaimes, compactadores, geradores e muito mais.
+                    Equipamentos de qualidade para sua obra com entrega rápida em Araguari e região.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="https://wa.me/5534999999999?text=Olá! Gostaria de informações sobre locação de máquinas."
+                       class="bg-green-600 text-white px-8 py-4 rounded-lg hover:bg-green-700 transition font-medium text-lg flex items-center gap-2">
+                        📱 WhatsApp
+                    </a>
+                    <a href="#equipamentos"
+                       class="bg-brand-500 text-white px-8 py-4 rounded-lg hover:bg-brand-600 transition font-medium text-lg">
+                        Ver Equipamentos
+                    </a>
+                    <a href="/accounts/login/"
+                       class="border-2 border-white/30 text-white px-8 py-4 rounded-lg hover:bg-white/10 transition font-medium text-lg">
+                        Área do Cliente →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NÚMEROS -->
+    <section class="bg-dark-900 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <p class="text-3xl md:text-4xl font-bold text-brand-400">+30</p>
+                    <p class="text-gray-400 text-sm mt-1">Anos de experiência</p>
+                </div>
+                <div>
+                    <p class="text-3xl md:text-4xl font-bold text-brand-400">+500</p>
+                    <p class="text-gray-400 text-sm mt-1">Obras atendidas</p>
+                </div>
+                <div>
+                    <p class="text-3xl md:text-4xl font-bold text-brand-400">+50</p>
+                    <p class="text-gray-400 text-sm mt-1">Equipamentos disponíveis</p>
+                </div>
+                <div>
+                    <p class="text-3xl md:text-4xl font-bold text-brand-400">24h</p>
+                    <p class="text-gray-400 text-sm mt-1">Entrega rápida</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVIÇOS -->
+    <section id="servicos" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Nossos Serviços</h2>
+                <p class="text-gray-600 text-lg max-w-2xl mx-auto">Locação flexível para atender sua obra do início ao fim</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition">
+                    <div class="text-4xl mb-4">📅</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Locação Flexível</h3>
+                    <p class="text-gray-600">Alugue por dia, semana ou mês. Condições especiais para obras de longa duração.</p>
+                </div>
+                <div class="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition">
+                    <div class="text-4xl mb-4">🚚</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Entrega na Obra</h3>
+                    <p class="text-gray-600">Levamos e buscamos os equipamentos no local da sua obra em Araguari e região.</p>
+                </div>
+                <div class="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition">
+                    <div class="text-4xl mb-4">🔧</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Manutenção Garantida</h3>
+                    <p class="text-gray-600">Todos equipamentos revisados e em perfeito estado. Substituição imediata em caso de falha.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- EQUIPAMENTOS -->
+    <section id="equipamentos" class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Nossos Equipamentos</h2>
+                <p class="text-gray-600 text-lg max-w-2xl mx-auto">Máquinas de qualidade para todos os tipos de obra</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div class="bg-white border-2 border-gray-100 rounded-xl p-6 text-center hover:border-brand-400 hover:shadow-lg transition">
+                    <div class="text-5xl mb-3">🔄</div>
+                    <h4 class="font-bold text-gray-900">Betoneiras</h4>
+                    <p class="text-sm text-gray-500 mt-1">400L e 600L</p>
+                </div>
+                <div class="bg-white border-2 border-gray-100 rounded-xl p-6 text-center hover:border-brand-400 hover:shadow-lg transition">
+                    <div class="text-5xl mb-3">🏗️</div>
+                    <h4 class="font-bold text-gray-900">Andaimes</h4>
+                    <p class="text-sm text-gray-500 mt-1">Tubular e Fachadeiro</p>
+                </div>
+                <div class="bg-white border-2 border-gray-100 rounded-xl p-6 text-center hover:border-brand-400 hover:shadow-lg transition">
+                    <div class="text-5xl mb-3">🚜</div>
+                    <h4 class="font-bold text-gray-900">Compactadores</h4>
+                    <p class="text-sm text-gray-500 mt-1">Solo e Placa Vibratória</p>
+                </div>
+                <div class="bg-white border-2 border-gray-100 rounded-xl p-6 text-center hover:border-brand-400 hover:shadow-lg transition">
+                    <div class="text-5xl mb-3">⚡</div>
+                    <h4 class="font-bold text-gray-900">Geradores</h4>
+                    <p class="text-sm text-gray-500 mt-1">50kVA a 100kVA</p>
+                </div>
+                <div class="bg-white border-2 border-gray-100 rounded-xl p-6 text-center hover:border-brand-400 hover:shadow-lg transition">
+                    <div class="text-5xl mb-3">💧</div>
+                    <h4 class="font-bold text-gray-900">Bombas</h4>
+                    <p class="text-sm text-gray-500 mt-1">Submersíveis 3cv a 5cv</p>
+                </div>
+                <div class="bg-white border-2 border-gray-100 rounded-xl p-6 text-center hover:border-brand-400 hover:shadow-lg transition">
+                    <div class="text-5xl mb-3">🔨</div>
+                    <h4 class="font-bold text-gray-900">Marteletes</h4>
+                    <p class="text-sm text-gray-500 mt-1">Rompedores 10kg</p>
+                </div>
+                <div class="bg-white border-2 border-gray-100 rounded-xl p-6 text-center hover:border-brand-400 hover:shadow-lg transition">
+                    <div class="text-5xl mb-3">📐</div>
+                    <h4 class="font-bold text-gray-900">Escoras</h4>
+                    <p class="text-sm text-gray-500 mt-1">Metálicas 3m a 4m</p>
+                </div>
+                <div class="bg-white border-2 border-gray-100 rounded-xl p-6 text-center hover:border-brand-400 hover:shadow-lg transition">
+                    <div class="text-5xl mb-3">🏋️</div>
+                    <h4 class="font-bold text-gray-900">Guinchos</h4>
+                    <p class="text-sm text-gray-500 mt-1">Coluna 500kg</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-12">
+                <a href="https://wa.me/5534999999999?text=Olá! Gostaria de saber sobre disponibilidade e preços dos equipamentos."
+                   class="inline-flex items-center gap-2 bg-green-600 text-white px-8 py-4 rounded-lg hover:bg-green-700 transition font-medium text-lg">
+                    📱 Solicitar Orçamento via WhatsApp
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- SOBRE -->
+    <section id="sobre" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Sobre a Construara</h2>
+                    <p class="text-gray-600 text-lg leading-relaxed mb-6">
+                        Somos uma empresa de locação de maquinário para construção civil que atua em Araguari/MG
+                        <strong>desde 1994</strong>. Com mais de 30 anos de experiência, oferecemos equipamentos
+                        de qualidade com entrega rápida e atendimento personalizado.
+                    </p>
+                    <p class="text-gray-600 text-lg leading-relaxed mb-6">
+                        Nossa missão é facilitar o dia a dia da sua obra, oferecendo máquinas revisadas,
+                        prontas para uso, com condições flexíveis de locação.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-gray-700">Equipamentos revisados</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-gray-700">Entrega na obra</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-gray-700">Preço justo</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-gray-700">Atendimento rápido</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-brand-500/10 rounded-2xl p-8 border border-brand-200">
+                    <div class="text-center">
+                        <span class="text-6xl">🏗️</span>
+                        <h3 class="text-2xl font-bold text-gray-900 mt-4">Construara</h3>
+                        <p class="text-gray-500 mt-2">Locadora de Máquinas para Construção</p>
+                        <p class="text-brand-600 font-medium mt-4">Araguari — MG</p>
+                        <p class="text-gray-400 text-sm mt-1">Desde 1994</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTATO / CTA -->
+    <section id="contato" class="py-20 bg-dark-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Fale Conosco</h2>
+                <p class="text-gray-400 text-lg">Entre em contato para orçamentos e disponibilidade</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                <a href="https://wa.me/5534999999999" class="bg-gray-800 rounded-xl p-6 text-center hover:bg-gray-700 transition">
+                    <div class="text-4xl mb-3">📱</div>
+                    <h4 class="font-bold text-white">WhatsApp</h4>
+                    <p class="text-gray-400 text-sm mt-1">(34) 99999-9999</p>
+                </a>
+                <a href="tel:+553434221994" class="bg-gray-800 rounded-xl p-6 text-center hover:bg-gray-700 transition">
+                    <div class="text-4xl mb-3">📞</div>
+                    <h4 class="font-bold text-white">Telefone</h4>
+                    <p class="text-gray-400 text-sm mt-1">(34) 3422-1994</p>
+                </a>
+                <a href="https://www.facebook.com/construara" target="_blank" class="bg-gray-800 rounded-xl p-6 text-center hover:bg-gray-700 transition">
+                    <div class="text-4xl mb-3">👍</div>
+                    <h4 class="font-bold text-white">Facebook</h4>
+                    <p class="text-gray-400 text-sm mt-1">@construara</p>
+                </a>
+            </div>
+
+            <div class="text-center mt-12">
+                <p class="text-gray-500 text-sm">📍 Araguari — Minas Gerais</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-black py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🏗️</span>
+                    <span class="text-white font-bold">Construara</span>
+                    <span class="text-gray-500 text-sm ml-2">Locadora de Máquinas</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="/accounts/login/" class="text-gray-400 hover:text-white transition text-sm">Área do Cliente</a>
+                    <span class="text-gray-700">|</span>
+                    <a href="https://www.facebook.com/construara" target="_blank" class="text-gray-400 hover:text-white transition text-sm">Facebook</a>
+                </div>
+                <p class="text-gray-600 text-sm">© 2026 Construara. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
