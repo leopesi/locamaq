@@ -1,5 +1,5 @@
 <!-- Sidebar Navigation -->
-<aside id="sidebar" class="sidebar fixed inset-y-0 left-0 w-64 bg-dark-950 text-white overflow-y-auto z-50 lg:translate-x-0 shadow-2xl">
+<aside id="sidebar" class="sidebar fixed inset-y-0 left-0 w-64 bg-gray-900 text-white overflow-y-auto z-50 lg:translate-x-0 shadow-2xl">
     <!-- Logo -->
     <div class="p-5 flex items-center justify-between border-b border-white/5">
         <a href="/" class="flex items-center gap-2.5">
@@ -62,7 +62,7 @@
     </nav>
 
     <!-- User -->
-    <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/5 bg-dark-950">
+    <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/5 bg-gray-900">
         <a href="{% url 'accounts:profile' %}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition" onclick="closeSidebarMobile()">
             <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white">
                 {{ user.first_name.0 }}{{ user.last_name.0 }}
