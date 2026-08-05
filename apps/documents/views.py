@@ -8,7 +8,7 @@ from apps.rentals.models import Rental
 
 @login_required
 def generate_pdf(request, rental_id):
-    """Generate a PDF receipt for a rental."""
+    """Generate a printable receipt for a rental (HTML optimized for print)."""
     rental = get_object_or_404(Rental, pk=rental_id, tenant=request.tenant)
     items = rental.items.select_related('equipment').all()
 
@@ -18,13 +18,13 @@ def generate_pdf(request, rental_id):
         'tenant': request.tenant,
     })
 
+    # Try WeasyPrint first
     try:
         from weasyprint import HTML
         pdf_file = HTML(string=html_content).write_pdf()
-
         response = HttpResponse(pdf_file, content_type='application/pdf')
         response['Content-Disposition'] = f'inline; filename="comprovante_locacao_{rental.pk}.pdf"'
         return response
-    except ImportError:
-        # Fallback if weasyprint not installed
+    except Exception:
+        # Fallback: render HTML optimized for browser print (Ctrl+P)
         return HttpResponse(html_content)
