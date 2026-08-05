@@ -1,74 +1,81 @@
 <!-- Sidebar Navigation -->
-<aside id="sidebar" class="sidebar fixed inset-y-0 left-0 w-64 bg-gray-900 text-white overflow-y-auto z-50 lg:translate-x-0">
-    <div class="p-6 flex items-center justify-between">
-        <a href="/" class="block">
-            <h1 class="text-2xl font-bold text-blue-400">🏗️ LocaMaq</h1>
-            <p class="text-xs text-gray-400 mt-1">Gestão de Locação</p>
+<aside id="sidebar" class="sidebar fixed inset-y-0 left-0 w-64 bg-dark-950 text-white overflow-y-auto z-50 lg:translate-x-0 shadow-2xl">
+    <!-- Logo -->
+    <div class="p-5 flex items-center justify-between border-b border-white/5">
+        <a href="/" class="flex items-center gap-2.5">
+            <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-lg">🏗️</div>
+            <div>
+                <h1 class="text-base font-bold text-white leading-tight">LocaMaq</h1>
+                <p class="text-[10px] text-slate-400 font-medium tracking-wide uppercase">Gestão de Locação</p>
+            </div>
         </a>
-        <button onclick="toggleSidebar()" class="lg:hidden text-gray-400 text-xl">✕</button>
+        <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white text-lg p-1">✕</button>
     </div>
 
-    <nav class="mt-2">
-        <!-- OPERAÇÕES (destaque) -->
-        <div class="px-6 py-2 text-xs text-blue-400 uppercase tracking-wider font-bold">Operações</div>
+    <nav class="py-4">
+        <!-- OPERAÇÕES -->
+        <div class="px-5 py-2 text-[10px] text-blue-400 uppercase tracking-widest font-bold">Operações</div>
 
-        <a href="{% url 'tenants:dashboard' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
-            <span class="mr-3">📊</span> Dashboard
+        <a href="{% url 'tenants:dashboard' %}" class="flex items-center gap-3 px-5 py-2.5 mx-2 rounded-lg hover:bg-white/5 transition text-sm text-slate-300 hover:text-white" onclick="closeSidebarMobile()">
+            <span class="text-base">📊</span> Dashboard
         </a>
-        <a href="{% url 'rentals:rental_list' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition bg-gray-800/50 border-l-4 border-blue-400" onclick="closeSidebarMobile()">
-            <span class="mr-3">📋</span> <strong>Locações</strong>
+        <a href="{% url 'rentals:rental_list' %}" class="flex items-center gap-3 px-5 py-2.5 mx-2 rounded-lg bg-blue-600/10 border border-blue-500/20 text-blue-300 hover:bg-blue-600/20 transition text-sm font-medium" onclick="closeSidebarMobile()">
+            <span class="text-base">📋</span> Locações
         </a>
-        <a href="{% url 'finance:dashboard' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition bg-gray-800/50 border-l-4 border-green-400" onclick="closeSidebarMobile()">
-            <span class="mr-3">💰</span> <strong>Financeiro</strong>
+        <a href="{% url 'finance:dashboard' %}" class="flex items-center gap-3 px-5 py-2.5 mx-2 rounded-lg bg-emerald-600/10 border border-emerald-500/20 text-emerald-300 hover:bg-emerald-600/20 transition text-sm font-medium" onclick="closeSidebarMobile()">
+            <span class="text-base">💰</span> Financeiro
         </a>
-        <a href="{% url 'alerts:notification_list' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
-            <span class="mr-3">🔔</span> Notificações
+        <a href="{% url 'alerts:notification_list' %}" class="flex items-center gap-3 px-5 py-2.5 mx-2 rounded-lg hover:bg-white/5 transition text-sm text-slate-300 hover:text-white" onclick="closeSidebarMobile()">
+            <span class="text-base">🔔</span> Notificações
         </a>
 
         {% if user.is_admin %}
-        <!-- ADMINISTRAÇÃO -->
-        <div class="px-6 py-2 mt-4 text-xs text-gray-500 uppercase tracking-wider border-t border-gray-700 pt-4">Cadastros</div>
+        <!-- CADASTROS -->
+        <div class="px-5 py-2 mt-5 text-[10px] text-slate-500 uppercase tracking-widest font-medium border-t border-white/5 pt-4">Cadastros</div>
 
-        <a href="{% url 'customers:customer_list' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
-            <span class="mr-3">👥</span> Clientes
+        <a href="{% url 'customers:customer_list' %}" class="flex items-center gap-3 px-5 py-2.5 mx-2 rounded-lg hover:bg-white/5 transition text-sm text-slate-300 hover:text-white" onclick="closeSidebarMobile()">
+            <span class="text-base">👥</span> Clientes
         </a>
-        <a href="{% url 'inventory:equipment_list' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
-            <span class="mr-3">🔧</span> Equipamentos
+        <a href="{% url 'inventory:equipment_list' %}" class="flex items-center gap-3 px-5 py-2.5 mx-2 rounded-lg hover:bg-white/5 transition text-sm text-slate-300 hover:text-white" onclick="closeSidebarMobile()">
+            <span class="text-base">🔧</span> Equipamentos
         </a>
 
         <!-- SISTEMA -->
-        <div class="px-6 py-2 mt-4 text-xs text-gray-500 uppercase tracking-wider border-t border-gray-700 pt-4">Sistema</div>
+        <div class="px-5 py-2 mt-5 text-[10px] text-slate-500 uppercase tracking-widest font-medium border-t border-white/5 pt-4">Sistema</div>
 
-        <a href="{% url 'promotions:promotion_list' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
-            <span class="mr-3">📢</span> Promoções
+        <a href="{% url 'promotions:promotion_list' %}" class="flex items-center gap-3 px-5 py-2.5 mx-2 rounded-lg hover:bg-white/5 transition text-sm text-slate-300 hover:text-white" onclick="closeSidebarMobile()">
+            <span class="text-base">📢</span> Promoções
         </a>
-        <a href="{% url 'accounts:user_list' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
-            <span class="mr-3">👥</span> Usuários
+        <a href="{% url 'accounts:user_list' %}" class="flex items-center gap-3 px-5 py-2.5 mx-2 rounded-lg hover:bg-white/5 transition text-sm text-slate-300 hover:text-white" onclick="closeSidebarMobile()">
+            <span class="text-base">👤</span> Usuários
         </a>
-        <a href="{% url 'alerts:setup' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
-            <span class="mr-3">🔔</span> Config. Alertas
+        <a href="{% url 'alerts:setup' %}" class="flex items-center gap-3 px-5 py-2.5 mx-2 rounded-lg hover:bg-white/5 transition text-sm text-slate-300 hover:text-white" onclick="closeSidebarMobile()">
+            <span class="text-base">⚙️</span> Config. Alertas
         </a>
-        <a href="{% url 'tenants:settings_general' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
-            <span class="mr-3">⚙️</span> Configurações
+        <a href="{% url 'tenants:settings_general' %}" class="flex items-center gap-3 px-5 py-2.5 mx-2 rounded-lg hover:bg-white/5 transition text-sm text-slate-300 hover:text-white" onclick="closeSidebarMobile()">
+            <span class="text-base">🛠️</span> Configurações
         </a>
-        <a href="{% url 'tenants:guide' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
-            <span class="mr-3">📚</span> Guia
+        <a href="{% url 'tenants:guide' %}" class="flex items-center gap-3 px-5 py-2.5 mx-2 rounded-lg hover:bg-white/5 transition text-sm text-slate-300 hover:text-white" onclick="closeSidebarMobile()">
+            <span class="text-base">📚</span> Guia
         </a>
         {% endif %}
+    </nav>
 
-        <!-- CONTA -->
-        <div class="px-6 py-2 mt-4 text-xs text-gray-500 uppercase tracking-wider border-t border-gray-700 pt-4">Conta</div>
-
-        <a href="{% url 'accounts:profile' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition" onclick="closeSidebarMobile()">
-            <div class="text-sm text-gray-300">
-                <span class="mr-3">👤</span> {{ user.get_full_name|default:user.username }}
-                {% if user.tenant %}<br><span class="text-xs text-blue-400 ml-8">{{ user.tenant.name }}</span>{% endif %}
+    <!-- User -->
+    <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/5 bg-dark-950">
+        <a href="{% url 'accounts:profile' %}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition" onclick="closeSidebarMobile()">
+            <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white">
+                {{ user.first_name.0 }}{{ user.last_name.0 }}
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-white truncate">{{ user.get_full_name|default:user.username }}</p>
+                {% if user.tenant %}<p class="text-[10px] text-slate-400 truncate">{{ user.tenant.name }}</p>{% endif %}
             </div>
         </a>
-        <a href="{% url 'accounts:logout' %}" class="flex items-center px-6 py-3 hover:bg-gray-800 transition text-red-400" onclick="closeSidebarMobile()">
-            <span class="mr-3">🚪</span> Sair
+        <a href="{% url 'accounts:logout' %}" class="flex items-center gap-2 mt-2 px-3 py-2 rounded-lg hover:bg-red-500/10 transition text-xs text-red-400 hover:text-red-300" onclick="closeSidebarMobile()">
+            <span>🚪</span> Sair da conta
         </a>
-    </nav>
+    </div>
 </aside>
 
 <script>

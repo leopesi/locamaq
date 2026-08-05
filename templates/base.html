@@ -10,45 +10,73 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#1e40af',
-                        secondary: '#64748b',
+                        primary: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' },
+                        dark: { 700: '#334155', 800: '#1e293b', 900: '#0f172a', 950: '#020617' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Mobile sidebar toggle */
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        /* Mobile sidebar */
         .sidebar-overlay { display: none; }
         .sidebar-overlay.active { display: block; }
         @media (max-width: 1023px) {
-            .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
             .sidebar.open { transform: translateX(0); }
         }
+        /* Smooth transitions */
+        .card { transition: box-shadow 0.2s ease, transform 0.1s ease; }
+        .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        /* Better inputs */
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+        /* Table row hover */
+        tbody tr { transition: background-color 0.15s ease; }
+        /* Button press */
+        button:active, a.btn:active { transform: scale(0.98); }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-slate-50 min-h-screen antialiased">
     {% if user.is_authenticated %}
     <!-- Mobile Header -->
-    <header class="lg:hidden fixed top-0 left-0 right-0 bg-gray-900 text-white z-40 px-4 py-3 flex items-center justify-between">
-        <button onclick="toggleSidebar()" class="text-2xl">☰</button>
-        <h1 class="text-lg font-bold text-blue-400">🏗️ LocaMaq</h1>
-        <a href="{% url 'accounts:logout' %}" class="text-red-400 text-sm">Sair</a>
+    <header class="lg:hidden fixed top-0 left-0 right-0 bg-dark-900 text-white z-40 px-4 py-3 flex items-center justify-between shadow-lg">
+        <button onclick="toggleSidebar()" class="text-xl p-1 rounded hover:bg-white/10 transition">☰</button>
+        <h1 class="text-base font-semibold text-blue-400">🏗️ LocaMaq</h1>
+        <a href="{% url 'accounts:logout' %}" class="text-red-400 text-xs p-1">Sair</a>
     </header>
 
     <!-- Overlay -->
-    <div id="sidebar-overlay" class="sidebar-overlay fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onclick="toggleSidebar()"></div>
+    <div id="sidebar-overlay" class="sidebar-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden" onclick="toggleSidebar()"></div>
 
     <!-- Sidebar -->
     {% include "partials/navbar.html" %}
     {% endif %}
 
-    <main class="{% if user.is_authenticated %}lg:ml-64 pt-14 lg:pt-0{% endif %} p-4 md:p-6">
+    <main class="{% if user.is_authenticated %}lg:ml-64 pt-14 lg:pt-0{% endif %} p-4 sm:p-6 lg:p-8">
         {% if messages %}
-        <div class="mb-4">
+        <div class="mb-6 space-y-2">
             {% for message in messages %}
-            <div class="p-4 rounded-lg mb-2 {% if message.tags == 'error' %}bg-red-100 text-red-700{% elif message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-blue-100 text-blue-700{% endif %}">
-                {{ message }}
+            <div class="flex items-center gap-3 p-4 rounded-xl shadow-sm border
+                {% if message.tags == 'error' %}bg-red-50 border-red-200 text-red-800
+                {% elif message.tags == 'success' %}bg-emerald-50 border-emerald-200 text-emerald-800
+                {% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %}">
+                {% if message.tags == 'error' %}<span class="text-lg">❌</span>
+                {% elif message.tags == 'success' %}<span class="text-lg">✅</span>
+                {% else %}<span class="text-lg">ℹ️</span>{% endif %}
+                <span class="text-sm font-medium">{{ message }}</span>
             </div>
             {% endfor %}
         </div>
