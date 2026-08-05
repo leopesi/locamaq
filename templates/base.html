@@ -65,7 +65,7 @@
     {% include "partials/navbar.html" %}
     {% endif %}
 
-    <main class="{% if user.is_authenticated %}lg:ml-64 pt-14 lg:pt-0{% endif %} p-4 sm:p-6 lg:p-8">
+    <main class="{% if user.is_authenticated %}lg:ml-64 pt-16 lg:pt-8{% endif %} p-4 sm:p-6 lg:p-8">
         {% if messages %}
         <div class="mb-6 space-y-2">
             {% for message in messages %}
