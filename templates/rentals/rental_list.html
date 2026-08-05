@@ -58,8 +58,9 @@
                 <td class="px-6 py-4 whitespace-nowrap font-medium">R$ {{ rental.total_value }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-right">
                     <a href="{% url 'rentals:rental_detail' rental.pk %}" class="text-blue-600 hover:text-blue-900 mr-2">Ver</a>
+                    <a href="{% url 'rentals:rental_edit' rental.pk %}" class="text-yellow-600 hover:text-yellow-900 mr-2">Editar</a>
                     {% if rental.status == 'active' %}
-                    <a href="{% url 'rentals:rental_return' rental.pk %}" class="text-green-600 hover:text-green-900 mr-2">Devolver</a>
+                    <a href="{% url 'rentals:rental_return' rental.pk %}" class="text-green-600 hover:text-green-900">Devolver</a>
                     {% endif %}
                 </td>
             </tr>
