@@ -54,11 +54,11 @@ class RentalForm(forms.ModelForm):
     qty_10 = forms.IntegerField(min_value=1, initial=1, required=False, label='Qtd')
     value_10 = forms.DecimalField(max_digits=10, decimal_places=2, required=False, label='Valor Unit.')
 
-    # Endereço de entrega
-    delivery_address = forms.CharField(max_length=300, required=False, label='Endereço de Entrega')
+    # Endereço de entrega (obrigatórios)
+    delivery_address = forms.CharField(max_length=300, required=True, label='Endereço de Entrega *')
     delivery_reference = forms.CharField(max_length=200, required=False, label='Ponto de Referência')
-    delivery_contact = forms.CharField(max_length=200, required=False, label='Responsável no Local')
-    delivery_phone = forms.CharField(max_length=20, required=False, label='Telefone do Responsável')
+    delivery_contact = forms.CharField(max_length=200, required=True, label='Responsável no Local *')
+    delivery_phone = forms.CharField(max_length=20, required=True, label='Telefone do Responsável *')
 
     class Meta:
         model = Rental
@@ -100,10 +100,10 @@ class RentalForm(forms.ModelForm):
             self.fields[f'value_{i}'].widget.attrs['placeholder'] = '0 = tabela'
             self.fields[f'qty_{i}'].widget.attrs['placeholder'] = '1'
 
-        self.fields['delivery_address'].widget.attrs['placeholder'] = 'Endereço de entrega da máquina'
+        self.fields['delivery_address'].widget.attrs['placeholder'] = 'Rua, número - Bairro, Cidade/UF'
         self.fields['delivery_reference'].widget.attrs['placeholder'] = 'Próximo a...'
         self.fields['delivery_contact'].widget.attrs['placeholder'] = 'Nome do responsável na obra'
-        self.fields['delivery_phone'].widget.attrs['placeholder'] = '(11) 99999-9999'
+        self.fields['delivery_phone'].widget.attrs['placeholder'] = '(34) 9 9999-9999'
 
     def clean(self):
         cleaned_data = super().clean()
