@@ -34,7 +34,7 @@
     <!-- Empresa + Número -->
     <div class="header-grid">
         <div class="company-info">
-            <strong>{{ tenant.name }}</strong><br>
+            <div style="font-size: 14px; font-weight: bold; color: #1e40af; margin-bottom: 3px;">🏗️ {{ tenant.name }}</div>
             CNPJ: {{ tenant.document }}<br>
             {% if tenant.phone %}Tel: {{ tenant.phone }}{% endif %}{% if tenant.email %} | {{ tenant.email }}{% endif %}<br>
             {% if tenant.address %}{{ tenant.address }}{% endif %}
