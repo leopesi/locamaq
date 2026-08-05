@@ -12,18 +12,23 @@
 </div>
 
 <!-- Summary -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-    <div class="bg-white rounded-lg shadow p-6 text-center">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-lg shadow p-4 text-center">
         <h3 class="text-sm text-gray-500 uppercase">Entradas</h3>
-        <p class="text-2xl font-bold text-green-600">R$ {{ income }}</p>
+        <p class="text-xl font-bold text-green-600">R$ {{ income }}</p>
     </div>
-    <div class="bg-white rounded-lg shadow p-6 text-center">
+    <div class="bg-white rounded-lg shadow p-4 text-center">
         <h3 class="text-sm text-gray-500 uppercase">Saídas</h3>
-        <p class="text-2xl font-bold text-red-600">R$ {{ expense }}</p>
+        <p class="text-xl font-bold text-red-600">R$ {{ expense }}</p>
     </div>
-    <div class="bg-white rounded-lg shadow p-6 text-center">
+    <div class="bg-white rounded-lg shadow p-4 text-center">
         <h3 class="text-sm text-gray-500 uppercase">Saldo</h3>
-        <p class="text-2xl font-bold {% if balance >= 0 %}text-green-600{% else %}text-red-600{% endif %}">R$ {{ balance }}</p>
+        <p class="text-xl font-bold {% if balance >= 0 %}text-green-600{% else %}text-red-600{% endif %}">R$ {{ balance }}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-4 text-center">
+        <h3 class="text-sm text-gray-500 uppercase">A Receber</h3>
+        <p class="text-xl font-bold text-yellow-600">R$ {{ pending }}</p>
+        {% if overdue_count %}<p class="text-xs text-red-500 mt-1">{{ overdue_count }} atrasado(s)</p>{% endif %}
     </div>
 </div>
 
@@ -48,6 +53,7 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descrição</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Valor</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-200">
@@ -76,10 +82,16 @@
                 <td class="px-6 py-4 whitespace-nowrap text-right font-medium {% if t.type == 'income' %}text-green-600{% else %}text-red-600{% endif %}">
                     {% if t.type == 'income' %}+{% else %}-{% endif %} R$ {{ t.value }}
                 </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right">
+                    <a href="{% url 'finance:transaction_edit' t.pk %}" class="text-blue-600 hover:text-blue-800 text-sm mr-2">Editar</a>
+                    {% if t.payment_status == 'pending' or t.payment_status == 'overdue' %}
+                    <a href="{% url 'finance:mark_paid' t.pk %}" class="text-green-600 hover:text-green-800 text-sm">✓ Pagar</a>
+                    {% endif %}
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" class="px-6 py-4 text-center text-gray-500">Nenhuma transação no período.</td>
+                <td colspan="6" class="px-6 py-4 text-center text-gray-500">Nenhuma transação no período.</td>
             </tr>
             {% endfor %}
         </tbody>

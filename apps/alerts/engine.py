@@ -38,7 +38,7 @@ class AlertEngine:
         return results
 
     def _check_overdue_rental(self, rule):
-        """Check for overdue rentals."""
+        """Check for overdue rentals (devolução atrasada)."""
         threshold_days = rule.threshold or 1
         overdue_rentals = Rental.objects.filter(
             tenant=self.tenant,
@@ -61,11 +61,13 @@ class AlertEngine:
                 if not exists:
                     notif = self._create_notification(
                         rule=rule,
-                        title=f'Locação #{rental.pk} atrasada há {days_overdue} dia(s)',
+                        title=f'⏰ Devolução atrasada: Locação #{rental.pk} ({days_overdue} dia{"s" if days_overdue > 1 else ""})',
                         message=f'Cliente: {rental.customer.name}\n'
+                                f'Telefone: {rental.customer.phone}\n'
                                 f'Devolução prevista: {rental.expected_return.strftime("%d/%m/%Y")}\n'
                                 f'Dias de atraso: {days_overdue}\n'
-                                f'Valor: R$ {rental.total_value}',
+                                f'Valor: R$ {rental.total_value}\n'
+                                f'Endereço: {rental.delivery_address}',
                         related_rental=rental,
                         related_customer=rental.customer,
                     )
@@ -101,8 +103,21 @@ class AlertEngine:
         return []
 
     def _check_payment_overdue(self, rule):
-        """Check for unpaid rentals past threshold days."""
+        """Check for unpaid rentals and overdue transactions."""
         threshold_days = rule.threshold or 7
+
+        # Marcar transações pendentes como atrasadas se due_date passou
+        from apps.finance.models import Transaction
+        overdue_transactions = Transaction.objects.filter(
+            tenant=self.tenant,
+            payment_status='pending',
+            due_date__lt=self.today,
+        )
+        for tx in overdue_transactions:
+            tx.payment_status = 'overdue'
+            tx.save()
+
+        # Gerar notificações para locações com pagamento atrasado
         unpaid_rentals = Rental.objects.filter(
             tenant=self.tenant,
             status='active',
@@ -124,7 +139,7 @@ class AlertEngine:
                 if not exists:
                     notif = self._create_notification(
                         rule=rule,
-                        title=f'Pagamento pendente: Locação #{rental.pk}',
+                        title=f'💸 Pagamento atrasado: Locação #{rental.pk}',
                         message=f'Cliente: {rental.customer.name}\n'
                                 f'Valor: R$ {rental.total_value}\n'
                                 f'Forma: {rental.get_payment_method_display()}\n'

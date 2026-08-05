@@ -5,9 +5,11 @@ from .models import Transaction
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
-        fields = ['type', 'value', 'description', 'date']
+        fields = ['type', 'value', 'description', 'date', 'due_date', 'paid_date', 'payment_status', 'payment_method']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
+            'due_date': forms.DateInput(attrs={'type': 'date'}),
+            'paid_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
     def __init__(self, *args, **kwargs):
