@@ -68,15 +68,35 @@ def promotion_send(request, pk):
         selected_customers = customers.filter(pk__in=selected_ids)
         sent_count = 0
         errors = 0
+        log_lines = []
 
         service = EvolutionAPIService.from_tenant(request.tenant)
+
+        from django.utils import timezone
+        now = timezone.now()
+        log_lines.append(f'--- Envio em {now.strftime("%d/%m/%Y %H:%M")} ---')
+        log_lines.append(f'Operador: {request.user.get_full_name()}')
+        log_lines.append(f'Destinatários selecionados: {selected_customers.count()}')
+        log_lines.append('')
 
         for customer in selected_customers:
             try:
                 service.send_text(customer.whatsapp, promotion.message)
                 sent_count += 1
-            except Exception:
+                log_lines.append(f'✅ {customer.name} ({customer.whatsapp}) — Enviado')
+            except Exception as e:
                 errors += 1
+                log_lines.append(f'❌ {customer.name} ({customer.whatsapp}) — FALHA: {str(e)[:100]}')
+
+        log_lines.append('')
+        log_lines.append(f'Resultado: {sent_count} enviado(s), {errors} falha(s)')
+        log_lines.append('---')
+
+        # Salvar log (append ao existente)
+        existing_log = promotion.send_log or ''
+        if existing_log:
+            existing_log += '\n\n'
+        promotion.send_log = existing_log + '\n'.join(log_lines)
 
         promotion.sent_at = timezone.now()
         promotion.recipients_count = sent_count
@@ -92,3 +112,11 @@ def promotion_send(request, pk):
         'promotion': promotion,
         'customers': customers,
     })
+
+
+@login_required
+@admin_required
+def promotion_log(request, pk):
+    """View send log for a promotion."""
+    promotion = get_object_or_404(Promotion, pk=pk, tenant=request.tenant)
+    return render(request, 'promotions/promotion_log.html', {'promotion': promotion})

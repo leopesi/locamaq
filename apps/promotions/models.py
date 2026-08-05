@@ -14,6 +14,8 @@ class Promotion(models.Model):
     image = models.ImageField('Imagem', upload_to='promotions/', blank=True, null=True)
     sent_at = models.DateTimeField('Enviado em', null=True, blank=True)
     recipients_count = models.PositiveIntegerField('Destinatários', default=0)
+    send_log = models.TextField('Relatório de Envio', blank=True,
+        help_text='Log detalhado de cada tentativa de envio')
     created_by = models.ForeignKey(
         'accounts.User',
         on_delete=models.SET_NULL,
@@ -29,3 +31,11 @@ class Promotion(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def send_status(self):
+        if not self.sent_at:
+            return 'pending'
+        if self.recipients_count == 0:
+            return 'failed'
+        return 'sent'

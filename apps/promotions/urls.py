@@ -8,4 +8,5 @@ urlpatterns = [
     path('create/', views.promotion_create, name='promotion_create'),
     path('<int:pk>/edit/', views.promotion_edit, name='promotion_edit'),
     path('<int:pk>/send/', views.promotion_send, name='promotion_send'),
+    path('<int:pk>/log/', views.promotion_log, name='promotion_log'),
 ]
