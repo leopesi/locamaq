@@ -25,7 +25,8 @@
 </div>
 
 <div class="bg-white rounded-lg shadow overflow-x-auto">
-    <table class="w-full min-w-[800px]">
+    <!-- Desktop: tabela -->
+    <table class="w-full hidden md:table">
         <thead class="bg-gray-50">
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
@@ -70,6 +71,34 @@
             </tr>
             {% endfor %}
         </tbody>
+    </table>
+
+    <!-- Mobile: cards -->
+    <div class="md:hidden divide-y divide-gray-100">
+        {% for rental in rentals %}
+        <a href="{% url 'rentals:rental_detail' rental.pk %}" class="block p-4 hover:bg-gray-50 transition">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="font-medium text-gray-800">#{{ rental.pk }} · {{ rental.customer.name }}</p>
+                    <p class="text-xs text-gray-500 mt-0.5">{{ rental.get_period_type_display }} · {{ rental.start_date|date:"d/m" }} → {{ rental.expected_return|date:"d/m" }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-bold text-sm">R$ {{ rental.total_value }}</p>
+                    <span class="px-2 py-0.5 text-[10px] rounded-full
+                        {% if rental.status == 'active' %}bg-green-100 text-green-800
+                        {% elif rental.status == 'returned' %}bg-gray-100 text-gray-800
+                        {% elif rental.status == 'overdue' %}bg-red-100 text-red-800
+                        {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                        {{ rental.get_status_display }}
+                    </span>
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <div class="p-6 text-center text-gray-500">Nenhuma locação encontrada.</div>
+        {% endfor %}
+    </div>
+</div>
     </table>
 </div>
 {% endblock %}

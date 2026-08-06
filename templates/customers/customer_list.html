@@ -24,7 +24,8 @@
 </div>
 
 <div class="bg-white rounded-lg shadow overflow-x-auto">
-    <table class="w-full min-w-[600px]">
+    <!-- Desktop: tabela -->
+    <table class="w-full hidden md:table">
         <thead class="bg-gray-50">
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
@@ -70,6 +71,32 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Mobile: cards -->
+    <div class="md:hidden divide-y divide-gray-100">
+        {% for customer in customers %}
+        <a href="{% url 'customers:customer_detail' customer.pk %}" class="block p-4 hover:bg-gray-50 transition">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="font-medium text-gray-800">{{ customer.name }}</p>
+                    <p class="text-xs text-gray-500 mt-0.5">{{ customer.document|default:"" }} {% if customer.city %}· {{ customer.city }}{% endif %}</p>
+                    <p class="text-xs text-gray-500">{{ customer.phone|default:"" }}</p>
+                </div>
+                <div>
+                    {% if customer.is_blocked %}
+                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-red-100 text-red-800">Bloqueado</span>
+                    {% elif customer.is_active %}
+                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-green-100 text-green-800">Ativo</span>
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <div class="p-6 text-center text-gray-500">
+            {% if search %}Nenhum cliente encontrado.{% else %}Nenhum cliente cadastrado.{% endif %}
+        </div>
+        {% endfor %}
+    </div>
 </div>
 
 <p class="mt-4 text-sm text-gray-500">{{ customers|length }} cliente{{ customers|length|pluralize:"s" }}</p>
