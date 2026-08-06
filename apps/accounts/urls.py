@@ -6,8 +6,12 @@ from . import views
 
 
 def logout_view(request):
-    """Logout that accepts both GET and POST."""
+    """Logout that accepts both GET and POST. Redirects to tenant landing if available."""
+    tenant = getattr(request, 'tenant', None) or (request.user.tenant if request.user.is_authenticated and hasattr(request.user, 'tenant') else None)
+    slug = tenant.slug if tenant and tenant.slug else None
     logout(request)
+    if slug:
+        return redirect('tenants:tenant_landing', slug=slug)
     return redirect('/')
 
 
