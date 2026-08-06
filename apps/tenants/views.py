@@ -23,6 +23,40 @@ def home(request):
     return render(request, 'landing.html')
 
 
+def tenant_landing(request, slug):
+    """Landing page per tenant (by slug)."""
+    from django.shortcuts import get_object_or_404
+    from apps.tenants.models import Tenant
+    from apps.inventory.models import Equipment
+    from django.db.models import Count
+
+    tenant = get_object_or_404(Tenant, slug=slug, is_active=True)
+
+    # Get equipment categories with counts
+    category_icons = {
+        'mixer': '🔄', 'scaffolding': '🏗️', 'compactor': '🚜',
+        'generator': '⚡', 'pump': '💧', 'other': '📦',
+    }
+    category_names = {
+        'mixer': 'Betoneiras', 'scaffolding': 'Andaimes', 'compactor': 'Compactadores',
+        'generator': 'Geradores', 'pump': 'Bombas', 'other': 'Outros',
+    }
+
+    categories = Equipment.objects.filter(tenant=tenant, state='available').values('category').annotate(count=Count('id')).order_by('-count')
+    equipment_categories = []
+    for cat in categories:
+        equipment_categories.append({
+            'name': category_names.get(cat['category'], cat['category']),
+            'icon': category_icons.get(cat['category'], '📦'),
+            'count': cat['count'],
+        })
+
+    return render(request, 'landing_tenant.html', {
+        'tenant': tenant,
+        'equipment_categories': equipment_categories,
+    })
+
+
 @login_required
 def guide(request):
     """Step-by-step onboarding guide."""

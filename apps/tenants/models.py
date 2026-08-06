@@ -22,6 +22,18 @@ class Tenant(models.Model):
     evolution_api_key = models.CharField('Evolution API Key', max_length=200, blank=True)
     evolution_instance = models.CharField('Instância Evolution', max_length=100, blank=True)
 
+    # Landing page
+    slug = models.SlugField('Slug (URL)', max_length=50, unique=True, blank=True, null=True,
+        help_text='URL da landing page: locamaq.com/site/sua-slug')
+    landing_headline = models.CharField('Título da Landing', max_length=200, blank=True,
+        help_text='Ex: Locação de Máquinas para Construção Civil')
+    landing_description = models.TextField('Descrição da Landing', blank=True,
+        help_text='Texto do hero da landing page')
+    landing_color = models.CharField('Cor principal', max_length=7, default='#2563eb', blank=True,
+        help_text='Cor em hex. Ex: #2563eb (azul), #f59e0b (laranja)')
+    landing_whatsapp = models.CharField('WhatsApp (landing)', max_length=20, blank=True,
+        help_text='Número para botão WhatsApp na landing. Ex: 5534988267096')
+
     is_active = models.BooleanField('Ativo', default=True)
     created_at = models.DateTimeField('Criado em', auto_now_add=True)
     updated_at = models.DateTimeField('Atualizado em', auto_now=True)

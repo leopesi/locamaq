@@ -5,6 +5,7 @@ app_name = 'tenants'
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('site/<slug:slug>/', views.tenant_landing, name='tenant_landing'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('guia/', views.guide, name='guide'),
     path('settings/', views.settings_general, name='settings_general'),
