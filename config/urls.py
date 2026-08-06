@@ -6,6 +6,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve
+import os
 
 
 urlpatterns = [
@@ -19,6 +21,8 @@ urlpatterns = [
     path('notifications/', include('apps.notifications.urls')),
     path('promotions/', include('apps.promotions.urls')),
     path('alerts/', include('apps.alerts.urls')),
+    # Service Worker must be served from root scope
+    path('sw.js', serve, {'document_root': os.path.join(settings.BASE_DIR, 'static'), 'path': 'sw.js'}),
     path('', include('apps.tenants.urls')),
 ]
 
