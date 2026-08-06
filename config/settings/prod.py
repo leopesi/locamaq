@@ -18,7 +18,13 @@ SECURE_HSTS_PRELOAD = True
 CSRF_TRUSTED_ORIGINS = [
     'http://76.13.66.202',
     'http://localhost',
+    'http://76.13.66.202:80',
 ]
+
+# Cookie settings for mobile compatibility
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_HTTPONLY = False
 
 # Static files served by Nginx in production
 STATIC_ROOT = BASE_DIR / 'staticfiles'
