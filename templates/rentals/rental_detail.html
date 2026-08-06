@@ -97,9 +97,11 @@
 {% endif %}
 
 <!-- Equipamentos -->
-<div class="bg-white rounded-lg shadow p-6 mb-6">
+<div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
     <h2 class="text-lg font-semibold text-gray-800 mb-4">🔧 Equipamentos</h2>
-    <table class="w-full">
+
+    <!-- Desktop -->
+    <table class="w-full hidden md:table">
         <thead class="bg-gray-50">
             <tr>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
@@ -131,6 +133,26 @@
             </tr>
         </tfoot>
     </table>
+
+    <!-- Mobile -->
+    <div class="md:hidden space-y-3">
+        {% for item in items %}
+        <div class="border rounded-lg p-3">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="font-medium text-sm">{{ item.equipment.name }}</p>
+                    <p class="text-xs text-gray-500 font-mono">{{ item.equipment.code }} · Qtd: {{ item.quantity }}</p>
+                </div>
+                <p class="font-bold text-sm">R$ {{ item.calculate_value }}</p>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-gray-500 text-sm text-center">Nenhum equipamento.</p>
+        {% endfor %}
+        <div class="border-t pt-3 flex justify-between items-center">
+            <span class="font-bold text-gray-700">Total:</span>
+            <span class="font-bold text-lg text-green-600">R$ {{ rental.total_value }}</span>
+    </div>
 </div>
 
 {% if rental.notes %}
